@@ -1,0 +1,27 @@
+# {{ ansible_managed }}
+# defaults for {{ shipyard_lb_service }} server
+
+# pulled in from the init script; makes things easier.
+NAME={{ shipyard_lb_service }}
+
+# Timeout for killing containers if not stopped within the specified timeout 'N' seconds
+TIMEOUT=5
+
+# user and group to be invoked as (default to root)
+{{ shipyard_lb_service }}_USER=root
+{{ shipyard_lb_service }}_GROUP=root
+
+# docker home location
+DOCKER=/usr/bin/docker
+
+# log location.  this may be a syslog facility.priority
+SHIPYARD_LOG=/var/log/$NAME.log
+
+# port for HTTP connector (default 80; disable with -1)
+HTTP_PORT={{ http_lb_port }}
+{% if https_lb_port is defined %}
+# port for HTTPS connector (default 443; disable with -1)
+HTTPS_PORT={{ https_lb_port }}	
+{% endif %}
+
+SHIPYARD_ARGS="{{ shipyard_lb_service }}"

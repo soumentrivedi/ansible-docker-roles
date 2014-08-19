@@ -1,0 +1,22 @@
+# {{ ansible_managed }}
+from stackbrew/ubuntu:12.04
+maintainer Soumen Trivedi "soumen.trivedi@gmail.com"
+
+{% if http_proxy is defined %}
+	env http_proxy {{ http_proxy }}
+{% endif %}
+
+{% if https_proxy is defined %}
+	env https_proxy {{ https_proxy }}
+{% endif %}
+
+run apt-get update
+run apt-get install -y libdevmapper1.02.1 libsqlite3-0
+add shipyard-agent /usr/local/bin/shipyard-agent
+add .docker/run.sh /usr/local/bin/run
+expose 4500
+{% if enable_ssh %}
+	expose 22
+{% endif %}
+
+cmd ["/usr/local/bin/run"]

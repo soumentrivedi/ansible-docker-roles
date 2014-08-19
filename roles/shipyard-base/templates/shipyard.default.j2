@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+# defaults for {{ shipyard_base_service }} server
+
+DOCKER=/usr/bin/docker
+
+# pulled in from the init script; makes things easier.
+NAME={{ shipyard_base_service }}
+
+SHIPYARD_LOG=/var/log/{{ shipyard_base_service }}.log
+
+SHIPYARD_SERVICES="{% for service in shipyard_services %} {{ service }}{% endfor %}"
+
+STATUS_ARGS="ps -a"

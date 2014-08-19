@@ -1,0 +1,33 @@
+---
+-   name: clearing {{ shipyard_redis_image }} containers
+    docker: image="{{ shipyard_redis_image }}"  state=absent
+
+-   name: Display return codes from cleared containers
+    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    with_items: docker_containers       
+
+-   name: run {{ shipyard_redis_service }} containers
+    docker: 
+      image: "{{ shipyard_redis_image }}"
+      ports: 
+        - "{{ redis_port }}:{{ redis_port }}"        
+      name: "{{ shipyard_redis_service }}"
+      state: running
+
+-   name: Display return codes from running containers
+    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    with_items: docker_containers       
+
+-   name: stop {{ shipyard_redis_service }} containers
+    docker: image="{{ shipyard_redis_service }}"  state=stopped
+
+-   name: Display return codes from stopped containers
+    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    with_items: docker_containers       
+         
+-   name: "write {{ shipyard_redis_service }} default configuration in /etc/default/"
+    template: src="{{ shipyard_redis_service }}.default.j2" dest="/etc/default/{{ shipyard_redis_service }}"    
+    
+-   name: "write {{ shipyard_redis_service }} as init script in /etc/init.d/"
+    template: src="{{ shipyard_redis_service }}.j2" dest="/etc/init.d/{{ shipyard_redis_service }}" mode=0755
+    notify: restart {{ shipyard_redis_service }}

@@ -1,0 +1,40 @@
+---
+-   name: get shipyard/shipyard-agent repo
+    git: repo=https://github.com/shipyard/shipyard-agent.git dest={{ project_root }}/shipyard-agent/
+
+-   name: "write Dockerfile in {{ project_root }}/shipyard-agent/"
+    template: src=Dockerfile.j2 dest={{ project_root }}/shipyard-agent/Dockerfile
+
+-   name: clearing {{ shipyard_agent_image }} containers
+    docker: image="{{ shipyard_agent_image }}"  state=absent
+
+-   name: Display return codes from cleared containers
+    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    with_items: docker_containers       
+
+-   name: run {{ shipyard_agent_service }} containers
+    docker: 
+      image: "{{ shipyard_agent_image }}"
+      ports: "{{ agent_host_port }}:4500"       
+      name: "{{ shipyard_agent_service }}"
+      env: "URL={{ shipyard_server_url }},IP={{ ansible_default_ipv4.address }}"       
+      volumes: "/var/run/docker.sock:/docker.sock"
+      state: running
+
+-   name: Display return codes from running containers
+    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    with_items: docker_containers       
+
+-   name: stop {{ shipyard_agent_service }} containers
+    docker: image="{{ shipyard_agent_service }}"  state=stopped
+
+-   name: Display return codes from stopped containers
+    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    with_items: docker_containers       
+         
+-   name: "write {{ shipyard_agent_service }} default configuration in /etc/default/"
+    template: src="{{ shipyard_agent_service }}.default.j2" dest="/etc/default/{{ shipyard_agent_service }}"
+
+-   name: "write {{ shipyard_agent_service }} as init script in /etc/init.d/"
+    template: src="{{ shipyard_agent_service }}.j2" dest="/etc/init.d/{{ shipyard_agent_service }}" mode="0755" 
+    notify: restart {{ shipyard_agent_service }}

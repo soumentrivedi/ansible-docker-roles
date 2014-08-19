@@ -1,0 +1,21 @@
+# {{ ansible_managed }}
+#!/bin/bash
+# /usr/bin/{{ shipyard_base_service }}-shutdown
+# Soumen Trivedi <soumen.trivedi@gmail.com>
+#
+
+[ -r /etc/default/{{ shipyard_base_service }} ] && . /etc/default/{{ shipyard_base_service }}
+
+# Make sure we run as root
+if [ `id -u` -ne 0 ]; then
+    echo "The $NAME init script can only be run as root. [HINT]: Use sudo"
+    exit 1
+fi
+  
+for i in $SHIPYARD_SERVICES
+do
+	echo "Shutting down $i"
+	/bin/bash /etc/init.d/$i stop >> $SHIPYARD_LOG 2>&1
+	echo "Exit code: $?"
+done
+exit 0

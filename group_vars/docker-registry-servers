@@ -1,0 +1,5 @@
+project_name: docker-registry
+init_service_name: docker-registry
+docker_image_name: docker-registry/master    
+docker_host_registry_port: 5000
+docker_registry_data_dir: docker-registry-data

@@ -1,0 +1,35 @@
+---
+-   name: clearing {{ shipyard_router_image }} containers
+    docker: image="{{ shipyard_router_image }}"  state=absent
+
+-   name: Display return codes from cleared containers
+    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    with_items: docker_containers       
+
+-   name: run {{ shipyard_router_service }} containers
+    docker: 
+      image: "{{ shipyard_router_image }}"
+      ports: 
+        - 80        
+      name: "{{ shipyard_router_service }}"
+      links: 
+        - "{{ shipyard_redis_service }}:redis"               
+      state: running
+
+-   name: Display return codes from running containers
+    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    with_items: docker_containers       
+
+-   name: stop {{ shipyard_router_service }} containers
+    docker: image="{{ shipyard_router_service }}"  state=stopped
+
+-   name: Display return codes from stopped containers
+    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    with_items: docker_containers       
+         
+-   name: "write {{ shipyard_router_service }} default configuration in /etc/default/"
+    template: src="{{ shipyard_router_service }}.default.j2" dest="/etc/default/{{ shipyard_router_service }}"
+
+-   name: "write {{ shipyard_router_service }} as init script in /etc/init.d/"
+    template: src="{{ shipyard_router_service }}.j2" dest="/etc/init.d/{{ shipyard_router_service }}" mode=0755 
+    notify: restart {{ shipyard_router_service }}

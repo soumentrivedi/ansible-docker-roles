@@ -1,0 +1,7 @@
+---
+-   name: setting up base platform for hosting docker containers
+    apt: name={{ item }} state=installed
+    when: ansible_distribution == 'Ubuntu'
+    with_items:    
+    - "{{ubuntu_packages}}"
+    - "{{common_packages}}" 

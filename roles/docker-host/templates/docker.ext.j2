@@ -1,0 +1,3 @@
+# {{ ansible_managed }}
+# DESCRIPTION:    Extended Docker option configuration
+DOCKER_OPTS="${DOCKER_OPTS} {% for opts in docker_custom_opts %} {{ opts }}{% endfor %}"

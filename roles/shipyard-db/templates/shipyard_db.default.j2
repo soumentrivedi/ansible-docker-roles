@@ -1,0 +1,20 @@
+# {{ ansible_managed }}
+# defaults for {{ shipyard_db_service }} server
+
+# pulled in from the init script; makes things easier.
+NAME={{ shipyard_db_service }}
+
+# Timeout for killing containers if not stopped within the specified timeout 'N' seconds
+TIMEOUT=5
+
+# user and group to be invoked as (default to root)
+{{ shipyard_db_service }}_USER=root
+{{ shipyard_db_service }}_GROUP=root
+
+# docker home location
+DOCKER=/usr/bin/docker
+
+# log location.  this may be a syslog facility.priority
+SHIPYARD_LOG=/var/log/$NAME.log
+
+SHIPYARD_ARGS="{{ shipyard_db_service }}"

@@ -1,0 +1,35 @@
+---
+- hosts: all
+  user: ansible
+  sudo: yes
+  roles:
+    - common  
+    - docker-host
+  
+## This playbook deploys a docker registry
+
+- hosts: docker-registry-servers
+  user: ansible
+  sudo: yes
+
+  roles:
+    - docker-registry
+ 
+# This playbook deploys a shipyard server
+
+- hosts: shipyard-servers
+  user: ansible
+  sudo: yes
+  roles:    
+    - shipyard-base
+    - shipyard-redis
+    - shipyard-router
+    - shipyard-lb
+    - shipyard-db
+    - shipyard-www
+    
+- hosts: shipyard-agents
+  user: ansible
+  sudo: yes
+  roles:    
+    - shipyard-agent

@@ -1,0 +1,17 @@
+# {{ ansible_managed }}
+#!/bin/bash
+# /usr/bin/{{ shipyard_base_service }}-startup
+# Soumen Trivedi <soumen.trivedi@gmail.com>
+#
+
+# Make sure we run as root
+if [ `id -u` -ne 0 ]; then
+    echo "The $NAME init script can only be run as root. [HINT]: Use sudo"
+    exit 1
+fi
+
+[ -r /etc/default/{{ shipyard_base_service }} ] && . /etc/default/{{ shipyard_base_service }}
+
+$DOCKER $STATUS_ARGS
+
+exit 0

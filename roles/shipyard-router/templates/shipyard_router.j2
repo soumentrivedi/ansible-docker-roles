@@ -1,0 +1,125 @@
+# {{ ansible_managed }}
+#!/bin/bash
+# /etc/init.d/{{ shipyard_router_service }}
+# debian-compatible {{ shipyard_router_service }} startup script.
+# Soumen Trivedi <soumen.trivedi@gmail.com>
+#
+### BEGIN INIT INFO
+# Provides:          {{ shipyard_router_service }}
+# Required-Start:    $remote_fs $syslog $network
+# Required-Stop:     $remote_fs $syslog $network
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Start {{ shipyard_router_service }} at boot time
+# Description:       Controls the {{ shipyard_router_service }} docker instances.
+### END INIT INFO
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+
+DESC="{{ shipyard_router_service }} Server"
+NAME={{ shipyard_router_service }}
+SCRIPTNAME=/etc/init.d/$NAME
+
+[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
+SU=/bin/su
+
+# load environments
+if [ -r /etc/default/locale ]; then
+  . /etc/default/locale
+  export LANG LANGUAGE
+elif [ -r /etc/environment ]; then
+  . /etc/environment
+  export LANG LANGUAGE
+fi
+
+# Load the VERBOSE setting and other rcS variables
+. /lib/init/vars.sh
+
+# Define LSB log_* functions.
+# Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
+. /lib/lsb/init-functions
+
+# Make sure we run as root, since setting the max open files through
+# ulimit requires root access
+if [ `id -u` -ne 0 ]; then
+    echo "The $NAME init script can only be run as root"
+    exit 1
+fi
+
+
+#
+# Function that starts the daemon/service
+#
+do_start()
+{    
+    $SU -l ${{ shipyard_router_service }}_USER --shell=/bin/bash -c "$DOCKER start $SHIPYARD_ARGS" > $SHIPYARD_LOG 2>&1 || return 2
+}
+
+#
+# Get status of {{ shipyard_router_service }} containers using docker ps <CONTAINER_NAME>
+# 
+get_status() 
+{
+	$SU -l $shipyard_USER --shell=/bin/bash -c "$DOCKER ps $SHIPYARD_ARGS" || return 2    
+}
+
+do_stop() 
+{
+    $DOCKER stop --time=$TIMEOUT $SHIPYARD_ARGS || return 3
+    # Many daemons don't delete their pidfiles when they exit.
+    rm -f $PIDFILE
+    return 0
+}
+
+
+case "$1" in
+  start)
+    log_daemon_msg "Starting $DESC" "$NAME"
+    do_start
+    case "$?" in
+        0|1) log_end_msg 0 ;;
+        2) log_end_msg 1 ;;
+    esac
+    ;;
+  stop)
+    log_daemon_msg "Stopping $DESC" "$NAME"
+    do_stop
+    case "$?" in
+        0|1) log_end_msg 0 ;;
+        2) log_end_msg 1 ;;
+    esac
+    ;;
+  restart|force-reload)
+    #
+    # If the "reload" option is implemented then remove the
+    # 'force-reload' alias
+    #
+    log_daemon_msg "Restarting $DESC" "$NAME"
+    do_stop
+    case "$?" in
+      0|1)
+        do_start
+        case "$?" in
+          0) log_end_msg 0 ;;
+          1) log_end_msg 1 ;; # Old process is still running
+          *) log_end_msg 1 ;; # Failed to start
+        esac
+        ;;
+      *)
+  	# Failed to stop
+	log_end_msg 1
+	;;
+    esac
+    ;;
+  status)
+		get_status
+		exit $rc
+		;;
+  *)
+    echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
+    exit 3
+    ;;
+esac
+
+exit 0

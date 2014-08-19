@@ -1,0 +1,35 @@
+---
+-   name: clearing {{ shipyard_www_image }} containers
+    docker: image="{{ shipyard_www_image }}"  state=absent
+
+-   name: Display return codes from cleared containers
+    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    with_items: docker_containers       
+
+-   name: run {{ shipyard_www_service }} containers
+    docker: 
+      image="{{ shipyard_www_image }}"
+      ports=8000:8000       
+      name="{{ shipyard_www_service }}"
+      env="REDIS_HOST={{ redis_host }},REDIS_PORT={{ redis_port }},ADMIN_PASS={{ admin_pass }}"
+      links={{ shipyard_db_service }}:db 
+      command="/app/.docker/run.sh app master-worker" 
+      state=running
+
+-   name: Display return codes from running containers
+    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    with_items: docker_containers       
+
+-   name: stop {{ shipyard_www_service }} containers
+    docker: image="{{ shipyard_www_service }}"  state=stopped
+
+-   name: Display return codes from stopped containers
+    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    with_items: docker_containers       
+         
+-   name: "write {{ shipyard_www_service }} default configuration in /etc/default/"
+    template: src="{{ shipyard_www_service }}.default.j2" dest="/etc/default/{{ shipyard_www_service }}"
+
+-   name: "write {{ shipyard_www_service }} as init script in /etc/init.d/"
+    template: src="{{ shipyard_www_service }}.j2" dest="/etc/init.d/{{ shipyard_www_service }}" mode="0755" 
+    notify: restart {{ shipyard_www_service }}

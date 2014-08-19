@@ -1,0 +1,4 @@
+---
+-   name: restart docker
+    service: name={{ docker_package }} state=restarted
+    when: docker_host.changed

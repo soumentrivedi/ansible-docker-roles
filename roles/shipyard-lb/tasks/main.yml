@@ -1,0 +1,55 @@
+---
+-   name: clearing {{ shipyard_lb_image }} containers
+    docker: image="{{ shipyard_lb_image }}"  state=absent
+
+-   name: Display return codes from cleared containers
+    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    with_items: docker_containers       
+
+-   name: run {{ shipyard_lb_service }} containers
+    docker: 
+      image: "{{ shipyard_lb_image }}"
+      ports: 
+        - "{{ http_lb_port }}:80"        
+      name: "{{ shipyard_lb_service }}"
+      links: 
+        - "{{ shipyard_redis_service }}:redis"
+        - "{{ shipyard_router_service }}:app_router"       
+      state: running
+    when: not ssl_enabled
+
+-   name: run {{ shipyard_lb_service }} containers with SSL enabled
+    docker: 
+      image: "{{ shipyard_lb_image }}"
+      ports: 
+        - "{{ http_lb_port }}:80"        
+        - "{{ https_lb_port }}:443"
+      name: "{{ shipyard_lb_service }}"      
+      links: 
+        - "{{ shipyard_redis_service }}:redis"
+        - "{{ shipyard_router_service }}:app_router"
+      env:
+        - "SSL_CERT_PATH=/opt/ssl/{{ ssl_cert }}"
+        - "SSL_KEY_PATH=/opt/ssl/{{ ssl_key }}"
+      volumes:
+        - "{{ host_ssl_store }}:/opt/ssl"         
+      state: running
+    when: ssl_enabled and ssl_cert is defined and ssl_key is defined and host_ssl_store is defined 
+
+-   name: Display return codes from running containers
+    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    with_items: docker_containers       
+
+-   name: stop {{ shipyard_lb_service }} containers
+    docker: image="{{ shipyard_lb_service }}"  state=stopped
+
+-   name: Display return codes from stopped containers
+    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    with_items: docker_containers       
+         
+-   name: "write {{ shipyard_lb_service }} default configuration in /etc/default/"
+    template: src="{{ shipyard_lb_service }}.default.j2" dest="/etc/default/{{ shipyard_lb_service }}"
+
+-   name: "write {{ shipyard_lb_service }} as init script in /etc/init.d/"
+    template: src="{{ shipyard_lb_service }}.j2" dest="/etc/init.d/{{ shipyard_lb_service }}" mode=0755 
+    notify: restart {{ shipyard_lb_service }}

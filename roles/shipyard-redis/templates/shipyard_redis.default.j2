@@ -1,0 +1,23 @@
+# {{ ansible_managed }}
+# defaults for {{ shipyard_redis_service }} server
+
+# pulled in from the init script; makes things easier.
+NAME={{ shipyard_redis_service }}
+
+# Timeout for killing containers if not stopped within the specified timeout 'N' seconds
+TIMEOUT=5
+
+# user and group to be invoked as (default to root)
+{{ shipyard_redis_service }}_USER=root
+{{ shipyard_redis_service }}_GROUP=root
+
+# docker home location
+DOCKER=/usr/bin/docker
+
+# log location.  this may be a syslog facility.priority
+SHIPYARD_LOG=/var/log/$NAME.log
+
+# port for REDIS connector (default {{ redis_port }}; disable with -1)
+REDIS_PORT={{ redis_port }}
+
+SHIPYARD_ARGS="{{ shipyard_redis_service }}"

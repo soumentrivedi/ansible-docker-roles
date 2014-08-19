@@ -1,0 +1,4 @@
+---
+-   name: restart {{ shipyard_db_service }}
+    service:  name={{ shipyard_db_service }} state=restarted enabled=yes
+    

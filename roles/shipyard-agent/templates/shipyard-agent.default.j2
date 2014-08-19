@@ -1,0 +1,22 @@
+# {{ ansible_managed }}
+# defaults for {{ shipyard_agent_service }} server
+
+# pulled in from the init script; makes things easier.
+NAME={{ shipyard_agent_service }}
+
+# Timeout for killing containers if not stopped within the specified timeout 'N' seconds
+TIMEOUT=5
+
+# user to be invoked as (default to root)
+SHIPYARD_USER=root
+
+# docker home location
+DOCKER=/usr/bin/docker
+
+# log location.  this may be a syslog facility.priority
+SHIPYARD_LOG=/var/log/$NAME.log
+
+# port for HTTP connector (default 8000; disable with -1)
+HTTP_PORT={{ agent_host_port }}
+
+SHIPYARD_ARGS="{{ shipyard_agent_service }}"

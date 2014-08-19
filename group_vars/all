@@ -1,0 +1,21 @@
+host: "{{inventory_hostname}}"
+
+common_packages:
+    -   git
+    -   python-pip
+    -   gcc
+
+ubuntu_packages:
+    -   python-selinux
+    -   python-dev
+    -   libevent-2.0-5
+    -   libevent-dev
+    -   python-openssl
+    
+# http_proxy: http://<username>:<password>@<proxy_host>:<proxy_port>
+http_proxy:
+enable_ssh: true
+project_root: /opt
+docker_custom_opts: 
+ - -H tcp://0.0.0.0:4243
+ - -H unix:///var/run/docker.sock

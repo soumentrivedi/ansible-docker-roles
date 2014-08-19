@@ -1,0 +1,34 @@
+# Environment Variables passed into Docker Containers
+redis_host: "{{ inventory_hostname }}"
+redis_port: 6379
+http_lb_port: 80
+https_lb_port: 4431
+admin_pass: "password"
+db_pass: "password"
+ssl_enabled: false
+# ssl_cert: mycert.crt
+# ssl_key: mycert.key
+# host_ssl_store: /opt/ssl
+
+# Docker Image Names
+shipyard_base_image: shipyard/deploy
+shipyard_redis_image: shipyard/redis
+shipyard_router_image: shipyard/router
+shipyard_lb_image: shipyard/lb
+shipyard_db_image: shipyard/db
+shipyard_www_image: shipyard/shipyard
+
+# Docker Container Names also used as init services
+shipyard_redis_service: shipyard_redis
+shipyard_router_service: shipyard_router
+shipyard_lb_service: shipyard_lb
+shipyard_db_service: shipyard_db
+shipyard_www_service: shipyard_www
+
+shipyard_base_service: shipyard
+shipyard_services:
+ - "{{ shipyard_redis_service }}"
+ - "{{ shipyard_router_service }}"
+ - "{{ shipyard_lb_service }}"
+ - "{{ shipyard_db_service }}"
+ - "{{ shipyard_www_service }}"

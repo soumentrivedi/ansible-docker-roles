@@ -1,0 +1,44 @@
+---
+-   name: get shipyard/shipyard repo
+    git: repo=https://github.com/shipyard/shipyard.git dest={{ project_root }}/shipyard-server/
+
+-   name: "write Dockerfile in {{ project_root }}/shipyard-server/"
+    template: src=Dockerfile.j2 dest={{ project_root }}/shipyard-server/Dockerfile
+    
+-   name: clearing {{ shipyard_base_image }} containers
+    docker: image="{{ shipyard_base_image }}"  state=absent
+
+-   name: Display return codes from cleared containers
+    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    with_items: docker_containers       
+
+-   name: run {{ shipyard_base_image }} containers
+    docker: 
+      image: "{{ shipyard_base_image }}"
+      volumes: "/var/run/docker.sock:/docker.sock"
+      name: "{{ shipyard_base_service }}"
+      command: setup
+      state: running
+
+-   name: Display return codes from running containers
+    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    with_items: docker_containers       
+
+-   name: stop {{ shipyard_base_image }} containers
+    docker: image="{{ shipyard_base_image }}"  state=stopped
+
+-   name: Display return codes from stopped containers
+    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    with_items: docker_containers
+    
+-   name: "write {{ shipyard_base_service }} default configuration in /etc/default/"
+    template: src="{{ shipyard_base_service }}.default.j2" dest="/etc/default/{{ shipyard_base_service }}"
+
+-   name: "write {{ shipyard_base_service }}-startup in /usr/bin"
+    template: src="{{ shipyard_base_service }}-startup.j2" dest="/usr/bin/{{ shipyard_base_service }}-startup" mode=0755
+       
+-   name: "write {{ shipyard_base_service }}-shutdown in /usr/bin"
+    template: src="{{ shipyard_base_service }}-shutdown.j2" dest="/usr/bin/{{ shipyard_base_service }}-shutdown" mode=0755
+    
+-   name: "write {{ shipyard_base_service }}-status in /usr/bin"
+    template: src="{{ shipyard_base_service }}-status.j2" dest="/usr/bin/{{ shipyard_base_service }}-status" mode=0755           
