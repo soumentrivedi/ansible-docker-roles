@@ -1,11 +1,15 @@
 ---
+-   stat: path=/etc/init.d/{{ shipyard_redis_service }}
+    register: init_service
+  
 -   name: clearing {{ shipyard_redis_image }} containers
     docker: image="{{ shipyard_redis_image }}"  state=absent
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
 
 -   name: Display return codes from cleared containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
-
+    
 -   name: run {{ shipyard_redis_service }} containers
     docker: 
       image: "{{ shipyard_redis_image }}"
@@ -13,14 +17,16 @@
         - "{{ redis_port }}:{{ redis_port }}"        
       name: "{{ shipyard_redis_service }}"
       state: running
-
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    
 -   name: Display return codes from running containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
 
 -   name: stop {{ shipyard_redis_service }} containers
     docker: image="{{ shipyard_redis_service }}"  state=stopped
-
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    
 -   name: Display return codes from stopped containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       

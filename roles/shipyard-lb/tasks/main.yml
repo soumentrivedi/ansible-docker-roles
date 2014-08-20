@@ -1,11 +1,16 @@
 ---
+-   stat: path=/etc/init.d/{{ shipyard_lb_service }}
+    register: init_service
+  
 -   name: clearing {{ shipyard_lb_image }} containers
     docker: image="{{ shipyard_lb_image }}"  state=absent
-
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    
 -   name: Display return codes from cleared containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
-
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    
 -   name: run {{ shipyard_lb_service }} containers
     docker: 
       image: "{{ shipyard_lb_image }}"
@@ -16,8 +21,8 @@
         - "{{ shipyard_redis_service }}:redis"
         - "{{ shipyard_router_service }}:app_router"       
       state: running
-    when: not ssl_enabled
-
+    when: not ssl_enabled and (not init_service.stat.exists or rebuild_local_container or rebuild_all_containers)
+    
 -   name: run {{ shipyard_lb_service }} containers with SSL enabled
     docker: 
       image: "{{ shipyard_lb_image }}"
@@ -34,15 +39,17 @@
       volumes:
         - "{{ host_ssl_store }}:/opt/ssl"         
       state: running
-    when: ssl_enabled and ssl_cert is defined and ssl_key is defined and host_ssl_store is defined 
-
+    when: (ssl_enabled and ssl_cert is defined and ssl_key is defined and host_ssl_store is defined) and (not init_service.stat.exists or rebuild_local_container or rebuild_all_containers)
+    
 -   name: Display return codes from running containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
-
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    
 -   name: stop {{ shipyard_lb_service }} containers
     docker: image="{{ shipyard_lb_service }}"  state=stopped
-
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    
 -   name: Display return codes from stopped containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       

@@ -3,7 +3,15 @@ agent_host_port: 4500
 
 # Docker Image Name
 shipyard_agent_image: shipyard/agent
-
 shipyard_agent_service: shipyard-agent
-
 shipyard_server_url: http://137.58.70.157:8000
+
+# Use this option very carefully as enabling this would cause
+# container(s) to be rebuilt every time this is set to true, 
+# default behavior is Build Container during First Run, followed 
+# by configurations being refreshed.
+# When upgrading the container definition or recovering from DR,
+# this option would need to be set as true.
+# Also refer rebuild_all_containers variable in the global 
+# all vars file that would override this and build all containers.
+rebuild_local_container: false

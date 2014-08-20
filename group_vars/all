@@ -11,11 +11,26 @@ ubuntu_packages:
     -   libevent-2.0-5
     -   libevent-dev
     -   python-openssl
-    
-# http_proxy: http://<username>:<password>@<proxy_host>:<proxy_port>
-http_proxy:
-enable_ssh: true
-project_root: /opt
+    -   python-setuptools
+
+docker_pips:
+    -   docker-py
+
 docker_custom_opts: 
  - -H tcp://0.0.0.0:4243
  - -H unix:///var/run/docker.sock
+    
+# http_proxy: http://<username>:<password>@<proxy_host>:<proxy_port>
+http_proxy: http://www-proxy.ericsson.se:8080
+enable_ssh: true
+project_root: /opt
+
+# Use this option very carefully as enabling this would cause
+# containers to be rebuilt every time this is set to true, 
+# default behavior is Build Container during First Run, followed 
+# by configurations being refreshed.
+# When upgrading the container definition or recovering from DR,
+# this option would need to be set as true.
+# Also refer rebuild_local_container variable in the respective role 
+# vars file that would enable only selective containers to be rebuilt.
+rebuild_all_containers: false

@@ -5,13 +5,18 @@
 -   name: "write Dockerfile in {{ project_root }}/shipyard-agent/"
     template: src=Dockerfile.j2 dest={{ project_root }}/shipyard-agent/Dockerfile
 
+-   stat: path=/etc/init.d/{{ shipyard_agent_service }}
+    register: init_service
+    
 -   name: clearing {{ shipyard_agent_image }} containers
     docker: image="{{ shipyard_agent_image }}"  state=absent
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
 
 -   name: Display return codes from cleared containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
-
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    
 -   name: run {{ shipyard_agent_service }} containers
     docker: 
       image: "{{ shipyard_agent_image }}"
@@ -20,21 +25,25 @@
       env: "URL={{ shipyard_server_url }},IP={{ ansible_default_ipv4.address }}"       
       volumes: "/var/run/docker.sock:/docker.sock"
       state: running
-
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    
 -   name: Display return codes from running containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
-
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    
 -   name: stop {{ shipyard_agent_service }} containers
     docker: image="{{ shipyard_agent_service }}"  state=stopped
-
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    
 -   name: Display return codes from stopped containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
-         
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+             
 -   name: "write {{ shipyard_agent_service }} default configuration in /etc/default/"
     template: src="{{ shipyard_agent_service }}.default.j2" dest="/etc/default/{{ shipyard_agent_service }}"
 
 -   name: "write {{ shipyard_agent_service }} as init script in /etc/init.d/"
     template: src="{{ shipyard_agent_service }}.j2" dest="/etc/init.d/{{ shipyard_agent_service }}" mode="0755" 
-    notify: restart {{ shipyard_agent_service }}
+    notify: restart {{ shipyard_agent_service }}    

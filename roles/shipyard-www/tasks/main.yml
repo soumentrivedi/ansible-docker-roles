@@ -1,7 +1,11 @@
 ---
+-   stat: path=/etc/init.d/{{ shipyard_www_service }}
+    register: init_service
+    
 -   name: clearing {{ shipyard_www_image }} containers
     docker: image="{{ shipyard_www_image }}"  state=absent
-
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    
 -   name: Display return codes from cleared containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
@@ -15,14 +19,16 @@
       links={{ shipyard_db_service }}:db 
       command="/app/.docker/run.sh app master-worker" 
       state=running
-
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    
 -   name: Display return codes from running containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
 
 -   name: stop {{ shipyard_www_service }} containers
     docker: image="{{ shipyard_www_service }}"  state=stopped
-
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    
 -   name: Display return codes from stopped containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       

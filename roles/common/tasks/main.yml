@@ -1,7 +1,19 @@
 ---
+-   name: Run the equivalent of "apt-get update" as a separate step
+    apt: update_cache=yes
+
 -   name: setting up base platform for hosting docker containers
     apt: name={{ item }} state=installed
     when: ansible_distribution == 'Ubuntu'
     with_items:    
     - "{{ubuntu_packages}}"
     - "{{common_packages}}" 
+
+-   name: installing pip modules
+    pip: name={{ item }} state=present
+    when: ansible_distribution == 'Ubuntu'
+    with_items:    
+    - "{{ docker_pips }}"
+
+-   name: Run the equivalent of "apt-get update" as a separate step
+    apt: update_cache=yes        

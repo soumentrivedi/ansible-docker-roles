@@ -1,10 +1,15 @@
 ---
+-   stat: path=/etc/init.d/{{ shipyard_db_service }}
+    register: init_service
+  
 -   name: clearing {{ shipyard_db_image }} containers
     docker: image="{{ shipyard_db_image }}"  state=absent
-
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    
 -   name: Display return codes from cleared containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
 
 -   name: run {{ shipyard_db_service }} containers
     docker: 
@@ -13,17 +18,21 @@
       name="{{ shipyard_db_service }}"
       env="DB_PASS={{ db_pass }}" 
       state=running
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
 
 -   name: Display return codes from running containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
 
 -   name: stop {{ shipyard_db_service }} containers
     docker: image="{{ shipyard_db_service }}"  state=stopped
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
 
 -   name: Display return codes from stopped containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
          
 -   name: "write {{ shipyard_db_service }} default configuration in /etc/default/"
     template: src="{{ shipyard_db_service }}.default.j2" dest="/etc/default/{{ shipyard_db_service }}"

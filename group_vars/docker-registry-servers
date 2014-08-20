@@ -3,3 +3,13 @@ init_service_name: docker-registry
 docker_image_name: docker-registry/master    
 docker_host_registry_port: 5000
 docker_registry_data_dir: docker-registry-data
+
+# Use this option very carefully as enabling this would cause
+# container(s) to be rebuilt every time this is set to true, 
+# default behavior is Build Container during First Run, followed 
+# by configurations being refreshed.
+# When upgrading the container definition or recovering from DR,
+# this option would need to be set as true.
+# Also refer rebuild_all_containers variable in the global 
+# all vars file that would override this and build all containers.
+rebuild_local_container: false

@@ -13,28 +13,37 @@
     
 -   name: check or build image
     docker_image: path="{{ project_root }}/docker-registry/" name="{{ docker_image_name }}" state=present
-         
+
+-   stat: path=/etc/init/{{ init_service_name }}.conf
+    register: init_service
+             
 -   name: clearing {{ docker_image_name }} containers
     docker: image="{{ docker_image_name }}"  state=absent
-    
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+        
 -   name: Display return codes from cleared containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
-    
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+            
 -   name: run {{ docker_image_name }} containers
     docker: image="{{ docker_image_name }}" ports="{{ docker_host_registry_port }}:5000" volumes="{{ project_root }}/{{ docker_registry_data_dir }}:/{{ docker_registry_data_dir }}" name="{{ init_service_name }}" state=running
-
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+        
 -   name: Display return codes from running containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
-
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+        
 -   name: stop {{ docker_image_name }} containers
     docker: image="{{ docker_image_name }}"  state=stopped
-    
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+            
 -   name: Display return codes from stopped containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
-         
+    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+                 
 -   name: "write {{ init_service_name }} default configuration in /etc/default/"
     template: src=docker-registry.default.j2 dest=/etc/default/{{ init_service_name }}
 

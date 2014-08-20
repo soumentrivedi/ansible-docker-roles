@@ -11,6 +11,12 @@
 -   set_fact: docker_default=/etc/default/docker
     when: ansible_distribution_major_version == '12' and ansible_distribution == 'Ubuntu'
   
+-   name: Adding docker apt_key
+    apt_key: keyserver=hkp://keyserver.ubuntu.com:80 id=36A1D7869245C8950F966E92D8576A8BA88D21E9
+
+-   name: Add docker repository into sources list.
+    apt_repository: repo='deb https://get.docker.io/ubuntu docker main' state=present update_cache=yes
+
 -   name: install docker
     apt: pkg={{ docker_package }} state=installed
     
@@ -30,7 +36,7 @@
     when: ansible_distribution == 'Ubuntu' and docker_default_file.stat.exists
     template: src=docker.ext.j2 dest=/etc/default/docker.ext
     register: docker_host
-    notify: restart docker
+    notify: restart-docker
 
 -   name: wait for docker on private ip port 4243
     wait_for: port=4243 delay=15 host={{ ansible_default_ipv4.address }}
