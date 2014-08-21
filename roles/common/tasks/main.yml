@@ -9,6 +9,23 @@
     - "{{ubuntu_packages}}"
     - "{{common_packages}}" 
 
+-   name: Updating kernel packages
+    apt: name={{ item }} state=installed
+    when: ansible_distribution == 'Ubuntu'
+    with_items:    
+    - "{{kernel_packages}}"
+    register: kernelup
+
+-   name: Restart the server
+    command: /sbin/reboot
+    sudo: true
+    when: kernelup.changed
+
+-   name: Wait for server to come up
+    local_action: wait_for host={{ansible_ssh_host}} port={{ansible_ssh_port}} delay=30
+    sudo: false    
+    when: kernelup.changed
+
 -   name: installing pip modules
     pip: name={{ item }} state=present
     when: ansible_distribution == 'Ubuntu'
@@ -16,4 +33,5 @@
     - "{{ docker_pips }}"
 
 -   name: Run the equivalent of "apt-get update" as a separate step
-    apt: update_cache=yes        
+    apt: update_cache=yes
+            

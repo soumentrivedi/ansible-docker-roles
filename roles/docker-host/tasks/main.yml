@@ -27,19 +27,29 @@
 -   name: Check Docker Custom Opts existence
     stat: path=/etc/default/docker.ext
     register: docker_ext_default_file
-  
--   name: Configuring DOCKER_OPTS for DOCKER HOST - key requirement for Shipyard server
-    when: docker_default_file.stat.exists and docker_ext_default_file.stat.exists == False 
-    shell: echo ". /etc/default/docker.ext" >> /etc/default/{{ docker_package }}
-    
+
 -   name: Creating extended DOCKER_OPTS
-    when: ansible_distribution == 'Ubuntu' and docker_default_file.stat.exists
+    when: ansible_distribution == 'Ubuntu' and docker_default_file.stat.exists and docker_ext_default_file.stat.exists == False
     template: src=docker.ext.j2 dest=/etc/default/docker.ext
     register: docker_host
-    notify: restart-docker
+      
+-   name: Configuring DOCKER_OPTS for DOCKER HOST - key requirement for Shipyard server
+    when: docker_default_file.stat.exists and docker_ext_default_file.stat.exists == False and ansible_distribution_major_version == '12' 
+    shell: echo ". /etc/default/docker.ext" >> /etc/default/docker
+
+-   name: restart-docker
+    service: name=docker state=restarted
+    when: ansible_distribution_major_version == '12'        
+  
+-   name: Configuring DOCKER_OPTS for DOCKER HOST - key requirement for Shipyard server
+    when: docker_default_file.stat.exists and docker_ext_default_file.stat.exists == False and ansible_distribution_major_version == '14' 
+    shell: echo ". /etc/default/docker.ext" >> /etc/default/docker.io
+
+-   name: restart-docker.io
+    service: name=docker.io state=restarted
+    when: ansible_distribution_major_version == '14'
 
 -   name: wait for docker on private ip port 4243
-    wait_for: port=4243 delay=15 host={{ ansible_default_ipv4.address }}
-    when: docker_host.changed
+    wait_for: port=4243 delay=15 host={{ ansible_default_ipv4.address }}    
 
 -   debug: msg="docker is up and listening on port 4243"

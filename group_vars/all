@@ -13,12 +13,17 @@ ubuntu_packages:
     -   python-openssl
     -   python-setuptools
 
+kernel_packages:
+    -   linux-image-generic-lts-raring
+    -   linux-headers-generic-lts-raring    
+
 docker_pips:
     -   docker-py
 
 docker_custom_opts: 
  - -H tcp://0.0.0.0:4243
  - -H unix:///var/run/docker.sock
+ - --restart=false
     
 # http_proxy: http://<username>:<password>@<proxy_host>:<proxy_port>
 http_proxy: http://www-proxy.ericsson.se:8080
