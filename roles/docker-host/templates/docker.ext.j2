@@ -6,3 +6,7 @@ DOCKER_OPTS="${DOCKER_OPTS} {% for opts in docker_custom_opts %} {{ opts }}{% en
 # If you need Docker to use an HTTP proxy, it can also be specified here.
 export http_proxy="{{ http_proxy }}"
 {% endif %}
+
+{% if no_proxy is defined %}
+export no_proxy="{{ no_proxy }}"
+{% endif %}

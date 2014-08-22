@@ -12,6 +12,10 @@ maintainer Soumen Trivedi "https://github.com/soumentrivedi"
 	env https_proxy {{ https_proxy }}
 {% endif %}
 
+{% if no_proxy is defined %}
+	env no_proxy {{ no_proxy }}
+{% endif %}
+
 run apt-get update
 run apt-get install -y python-dev python-setuptools libxml2-dev libxslt-dev libmysqlclient-dev supervisor wget make g++ libreadline-dev libncurses5-dev libpcre3-dev libpq-dev libmysqlclient-dev git-core
 env SHIPYARD_APP_DIR /app

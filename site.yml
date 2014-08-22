@@ -2,12 +2,12 @@
 - hosts: all
   user: vagrant
   sudo: yes  
+  gather_facts: yes
   roles:
     - common  
     - docker-host
   
 ## This playbook deploys a docker registry
-#
 - hosts: docker-registry-servers
   roles:
     - docker-registry

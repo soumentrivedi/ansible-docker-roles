@@ -26,7 +26,10 @@ docker_custom_opts:
  - --restart=false
     
 # http_proxy: http://<username>:<password>@<proxy_host>:<proxy_port>
-http_proxy: http://www-proxy.ericsson.se:8080
+http_proxy: 
+no_proxy: 
+ - localhost
+ - 127.0.0.0/8  
 enable_ssh: true
 project_root: /opt
 
