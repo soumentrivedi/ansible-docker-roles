@@ -1,0 +1,37 @@
+{# Set up VirtualHosts - servername and proxypass are required. #}
+{% for vhost in apache_vhosts %}
+<VirtualHost *:{{ apache_listen_port }}>
+{% if vhost.serveradmin is defined %}
+  ServerAdmin {{ vhost.serveradmin }}
+{% endif %}
+  ServerName {{ vhost.servername }}
+  ServerAlias {{ vhost.serveralias }}
+  
+  Header set Host	"{{ vhost.servername }}"
+  RequestHeader set X-Forwarded-Proto "http"
+  ProxyRequests     off
+  ProxyPreserveHost on
+  ProxyPass	/	{{ vhost.proxyurl }}
+  ProxyPassReverse	/	{{ vhost.proxyurl }}
+
+  ErrorLog          ${APACHE_LOG_DIR}/{{ vhost.servername }}_error.log
+  CustomLog         ${APACHE_LOG_DIR}/{{ vhost.servername }}_access.log combined
+{% if vhost.loglevel is defined %}
+  LogLevel          {{ vhost.loglevel }}
+{% else %}
+  LogLevel          info
+{% endif %}  
+
+{% for location in vhost.location %}
+  <Location "{{ location }}">
+		Order allow,deny
+		Allow from all
+		Satisfy any
+  </Location>
+{% endfor %}  
+{% if vhost.extra_parameters is defined %}
+  {{ vhost.extra_parameters }}
+{% endif %}
+</VirtualHost>
+
+{% endfor %}
