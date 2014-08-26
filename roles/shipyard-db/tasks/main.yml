@@ -14,7 +14,7 @@
 -   name: run {{ shipyard_db_service }} containers
     docker: 
       image="{{ shipyard_db_image }}"
-      ports=5432       
+      ports={{ db_port }}:{{ db_port }}
       name="{{ shipyard_db_service }}"
       env="DB_PASS={{ db_pass }}" 
       state=running

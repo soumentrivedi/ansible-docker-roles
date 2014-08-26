@@ -1,8 +1,11 @@
 # Environment Variables passed into Docker Containers
-redis_host: "{{ inventory_hostname }}"
+redis_host: "{{ ansible_default_ipv4.address }}"
 redis_port: 6379
 http_lb_port: 80
-https_lb_port: 4431
+https_lb_port: 443
+db_port: 5432
+www_port: 8000
+
 admin_pass: "password"
 db_pass: "password"
 ssl_enabled: false

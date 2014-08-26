@@ -13,7 +13,7 @@
 -   name: run {{ shipyard_www_service }} containers
     docker: 
       image="{{ shipyard_www_image }}"
-      ports=8000:8000       
+      ports={{ www_port }}:{{ www_port }}       
       name="{{ shipyard_www_service }}"
       env="REDIS_HOST={{ redis_host }},REDIS_PORT={{ redis_port }},ADMIN_PASS={{ admin_pass }}"
       links={{ shipyard_db_service }}:db 

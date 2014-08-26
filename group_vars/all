@@ -23,7 +23,8 @@ docker_pips:
 docker_custom_opts: 
  - -H tcp://0.0.0.0:4243
  - -H unix:///var/run/docker.sock
- - --restart=false
+ - --restart=false 
+ - -g /home/docker 
     
 # http_proxy: http://<username>:<password>@<proxy_host>:<proxy_port>
 http_proxy: 

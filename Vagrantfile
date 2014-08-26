@@ -22,7 +22,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define :server1 do |server1_config|
     server1_config.vm.box = BOX_NAME
     server1_config.vm.box_url = BOX_URI
-    server1_config.vm.network :private_network, ip: "10.1.42.30"	    
+    server1_config.vm.network :private_network, ip: "10.1.42.30"
+	#server1_config.proxy.http  = "http://<username>:<password>@<proxy_host>:<proxy_port>"
+	#server1_config.proxy.https = "http://<username>:<password>@<proxy_host>:<proxy_port>"    	    
 	server1_config.proxy.no_proxy = "$no_proxy,shipyardserver.local,node1.local,node2.local"
     server1_config.vm.network :forwarded_port, host: 45680, guest: 8000
     server1_config.vm.hostname = "shipyardserver.local"
@@ -41,6 +43,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     node1_config.vm.box = BOX_NAME
     node1_config.vm.box_url = BOX_URI
     node1_config.vm.network :private_network, ip: "10.1.42.10"
+	#node1_config.proxy.http  = "http://<username>:<password>@<proxy_host>:<proxy_port>"
+	#node1_config.proxy.https = "http://<username>:<password>@<proxy_host>:<proxy_port>"
 	node1_config.proxy.no_proxy = "$no_proxy,shipyardserver.local,node1.local,node2.local"
     node1_config.vm.hostname = "node1.local"
     node1_config.ssh.forward_agent = true
@@ -58,6 +62,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     node2_config.vm.box = BOX_NAME
     node2_config.vm.box_url = BOX_URI
     node2_config.vm.network :private_network, ip: "10.1.42.20"
+	#node2_config.proxy.http  = "http://<username>:<password>@<proxy_host>:<proxy_port>"
+	#node2_config.proxy.https = "http://<username>:<password>@<proxy_host>:<proxy_port>"    
 	node2_config.proxy.no_proxy = "$no_proxy,shipyardserver.local,node1.local,node2.local"    
     node2_config.vm.hostname = "node2.local"
     node2_config.ssh.forward_agent = true
