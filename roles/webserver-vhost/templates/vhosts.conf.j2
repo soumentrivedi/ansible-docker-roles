@@ -13,7 +13,11 @@
   ProxyPreserveHost on
   ProxyPass	/	{{ vhost.proxyurl }}
   ProxyPassReverse	/	{{ vhost.proxyurl }}
-
+{% if vhost.noproxy is defined %}
+  NoProxy localhost {{ ansible_default_ipv4.network }} {{ vhost.noproxy }}
+{% else %}
+  NoProxy localhost {{ ansible_default_ipv4.network }}
+{% endif %}  
   ErrorLog          ${APACHE_LOG_DIR}/{{ vhost.servername }}_error.log
   CustomLog         ${APACHE_LOG_DIR}/{{ vhost.servername }}_access.log combined
 {% if vhost.loglevel is defined %}

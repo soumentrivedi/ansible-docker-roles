@@ -1,8 +1,8 @@
 # Environment Variables passed into Docker Containers
 redis_host: "{{ ansible_default_ipv4.address }}"
 redis_port: 6379
-http_lb_port: 80
-https_lb_port: 443
+http_lb_port: 8100
+https_lb_port: 4431
 db_port: 5432
 www_port: 8000
 
@@ -45,3 +45,12 @@ shipyard_services:
 # Also refer rebuild_all_containers variable in the global 
 # all vars file that would override this and build all containers.
 rebuild_local_container: false 
+
+# Use this option very carefully as enabling this would cause
+# containers configurations to be rebuilt every time this is set
+# to true, default behavior is build Container configuration during
+# First Run. When upgrading the container config or recovering from DR,
+# this option would need to be set as true.
+# Also refer update_all_config variable in the global all 
+# vars file that would enable all container config to be refreshed.
+update_local_config: false

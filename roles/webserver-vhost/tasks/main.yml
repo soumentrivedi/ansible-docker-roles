@@ -4,11 +4,18 @@
     
 -   include: "setup_Debian.yml"
     when: ansible_os_family == 'Debian'
-  
+
+-   name: Enable Apache mods
+    apache2_module: >
+      name={{ item }}      
+      state=present
+    with_items: apache_mods_enabled
+    notify: restart apache
+      
 -   name: Add apache vhosts configuration.
     template: >
       src=vhosts.conf.j2
-      dest={{ apache_conf_path }}/vhosts.conf
+      dest={{ apache_conf_path }}/{{ base_service }}.conf
       owner=root group=root mode=644
     notify: restart apache
     when: apache_create_vhosts

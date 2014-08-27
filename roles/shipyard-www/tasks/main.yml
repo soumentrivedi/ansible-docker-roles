@@ -34,8 +34,8 @@
     with_items: docker_containers       
          
 -   name: "write {{ shipyard_www_service }} default configuration in /etc/default/"
-    template: src="{{ shipyard_www_service }}.default.j2" dest="/etc/default/{{ shipyard_www_service }}"
-
+    template: src="{{ shipyard_www_service }}.default.j2" dest="/etc/default/{{ shipyard_www_service }}"    
+    
 -   name: "write {{ shipyard_www_service }} as init script in /etc/init.d/"
-    template: src="{{ shipyard_www_service }}.j2" dest="/etc/init.d/{{ shipyard_www_service }}" mode="0755" 
+    template: src="{{ shipyard_www_service }}.j2" dest="/etc/init.d/{{ shipyard_www_service }}" mode="0755"    
     notify: restart {{ shipyard_www_service }}

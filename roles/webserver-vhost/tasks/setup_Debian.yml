@@ -21,11 +21,10 @@
         line: "NameVirtualHost *:{{ apache_listen_port }}"
       }
     notify: restart apache
-
--   name: Enable Apache mods (Debian).
-    file: >
-      src={{ apache_server_root }}/mods-available/{{ item }}
-      dest={{ apache_server_root }}/mods-enabled/{{ item }}
-      state=link
-    with_items: apache_mods_enabled
-    notify: restart apache
+    
+-   name: Disable Apache sites
+    command: >
+      {{ apache_disable_site_daemon }} {{ item }} 
+      creates={{ apache_server_root }}/sites-available/{{ item }}.disable     
+    with_items: apache_sites_disabled
+    notify: restart apache        

@@ -1,0 +1,12 @@
+---
+-   name: Adding docker apt_key
+    apt_key: keyserver={{ apt_key_server }} id={{ apt_key }}
+
+-   name: Add docker repository into sources list.
+    apt_repository: repo='{{ apt_repo }}' state=present update_cache=yes
+
+-   name: install docker
+    apt: pkg={{ docker_package }} state=installed
+
+-   name: Creating extended DOCKER_OPTS
+    template: src=docker.ext.j2 dest={{ default_conf }}/docker.ext

@@ -22,6 +22,7 @@
       image: "{{ shipyard_agent_image }}"
       ports: "{{ agent_host_port }}:4500"       
       name: "{{ shipyard_agent_service }}"
+      hostname: "{{ ansible_hostname }}"
       env: "URL={{ shipyard_server_url }},IP={{ ansible_default_ipv4.address }}"       
       volumes: "/var/run/docker.sock:/docker.sock"
       state: running
@@ -32,6 +33,7 @@
       image: "{{ shipyard_agent_image }}"
       ports: "{{ agent_host_port }}:4500"       
       name: "{{ shipyard_agent_service }}"
+      hostname: "{{ ansible_hostname }}"
       env: "URL={{ shipyard_server_url }},IP={{ ansible_eth1.ipv4.address }},http_proxy="       
       volumes: "/var/run/docker.sock:/docker.sock"
       state: running

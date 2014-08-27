@@ -1,0 +1,4 @@
+---
+docker_package: lxc-docker
+docker_service: docker
+docker_default: /etc/default/docker

@@ -6,27 +6,27 @@
   roles:
     - common  
     - docker-host
-  
-## This playbook deploys a docker registry
-- hosts: docker-registry-servers
-  roles:
-    - docker-registry
- 
-# This playbook deploys a shipyard server
 
-- hosts: shipyard-servers
-  user: vagrant
-  sudo: yes    
-  roles:    
-    - shipyard-base
-    - shipyard-redis
-    - shipyard-router
-    - shipyard-lb
-    - shipyard-db
-    - shipyard-www
-    
+## This role deploys shipyard-agents
 - hosts: shipyard-agents  
   user: vagrant
   sudo: yes  
   roles:    
     - shipyard-agent
+      
+## This role deploys a docker registry
+- hosts: docker-registry-servers
+  user: vagrant
+  sudo: yes
+  roles:
+    - docker-registry
+    - shipyard-agent
+ 
+# This role deploys a shipyard server
+- hosts: shipyard-servers
+  user: vagrant
+  sudo: yes    
+  roles:
+    - shipyard-www
+    - webserver-vhost    
+    

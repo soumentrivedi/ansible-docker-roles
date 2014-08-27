@@ -1,55 +1,29 @@
 ---
--   set_fact: docker_package=docker.io
-    when: ansible_distribution_major_version == '14' and ansible_distribution == 'Ubuntu'
-
--   set_fact: docker_package=lxc-docker
-    when: ansible_distribution_major_version == '12' and ansible_distribution == 'Ubuntu'
-
--   set_fact: docker_default=/etc/default/{{ docker_package }}
-    when: ansible_distribution_major_version == '14' and ansible_distribution == 'Ubuntu'
-
--   set_fact: docker_default=/etc/default/docker
-    when: ansible_distribution_major_version == '12' and ansible_distribution == 'Ubuntu'
-  
--   name: Adding docker apt_key
-    apt_key: keyserver=hkp://keyserver.ubuntu.com:80 id=36A1D7869245C8950F966E92D8576A8BA88D21E9
-
--   name: Add docker repository into sources list.
-    apt_repository: repo='deb https://get.docker.io/ubuntu docker main' state=present update_cache=yes
-
--   name: install docker
-    apt: pkg={{ docker_package }} state=installed
+-   name: Include common variables.
+    include_vars: common
     
+-   name: Include OS-specific variables.
+    include_vars: "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}"
+
+-   include: "setup_Debian.yml"
+    when: ansible_os_family == 'Debian'
+     
 -   name: Check Docker existence
     stat: path={{ docker_default }}
     register: docker_default_file
 
--   name: Check Docker Custom Opts existence
-    stat: path=/etc/default/docker.ext
-    register: docker_ext_default_file
-
--   name: Creating extended DOCKER_OPTS
-    when: ansible_distribution == 'Ubuntu' and docker_default_file.stat.exists and docker_ext_default_file.stat.exists == False
-    template: src=docker.ext.j2 dest=/etc/default/docker.ext
-    register: docker_host
+-   name: Creating reference for extended DOCKER_OPTS
+    lineinfile: dest={{ docker_default }} line=". {{ default_conf }}/docker.ext" insertafter="^DOCKER_OPTS=(.*)"
+    when: docker_default_file.stat.exists
+    register: docker_ext_action 
       
--   name: Configuring DOCKER_OPTS for DOCKER HOST - key requirement for Shipyard server
-    when: docker_default_file.stat.exists and docker_ext_default_file.stat.exists == False and ansible_distribution_major_version == '12' 
-    shell: echo ". /etc/default/docker.ext" >> /etc/default/docker
-
 -   name: restart-docker
-    service: name=docker state=restarted
-    when: ansible_distribution_major_version == '12'        
+    service: name={{ docker_service }} state=restarted
+    when: docker_ext_action.changed            
   
--   name: Configuring DOCKER_OPTS for DOCKER HOST - key requirement for Shipyard server
-    when: docker_default_file.stat.exists and docker_ext_default_file.stat.exists == False and ansible_distribution_major_version == '14' 
-    shell: echo ". /etc/default/docker.ext" >> /etc/default/docker.io
-
--   name: restart-docker.io
-    service: name=docker.io state=restarted
-    when: ansible_distribution_major_version == '14'
-
 -   name: wait for docker on private ip port 4243
-    wait_for: port=4243 delay=15 host={{ ansible_default_ipv4.address }}    
+    wait_for: port=4243 delay=15 host={{ ansible_default_ipv4.address }}
+    when: docker_ext_action.changed    
 
 -   debug: msg="docker is up and listening on port 4243"
+    when: docker_ext_action.changed

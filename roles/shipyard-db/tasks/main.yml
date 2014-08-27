@@ -35,8 +35,8 @@
     when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
          
 -   name: "write {{ shipyard_db_service }} default configuration in /etc/default/"
-    template: src="{{ shipyard_db_service }}.default.j2" dest="/etc/default/{{ shipyard_db_service }}"
+    template: src="{{ shipyard_db_service }}.default.j2" dest="/etc/default/{{ shipyard_db_service }}"    
 
 -   name: "write {{ shipyard_db_service }} as init script in /etc/init.d/"
     template: src="{{ shipyard_db_service }}.j2" dest="/etc/init.d/{{ shipyard_db_service }}" mode=0755 
-    notify: restart {{ shipyard_db_service }}
+    notify: restart {{ shipyard_db_service }}   

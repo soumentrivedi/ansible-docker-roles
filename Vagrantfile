@@ -23,10 +23,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     server1_config.vm.box = BOX_NAME
     server1_config.vm.box_url = BOX_URI
     server1_config.vm.network :private_network, ip: "10.1.42.30"
-	#server1_config.proxy.http  = "http://<username>:<password>@<proxy_host>:<proxy_port>"
-	#server1_config.proxy.https = "http://<username>:<password>@<proxy_host>:<proxy_port>"    	    
-	server1_config.proxy.no_proxy = "$no_proxy,shipyardserver.local,node1.local,node2.local"
-    server1_config.vm.network :forwarded_port, host: 45680, guest: 8000
+	server1_config.proxy.http  = "http://www-proxy.ericsson.se:8080"
+	server1_config.proxy.https = "http://www-proxy.ericsson.se:8080"    	    
+	server1_config.proxy.no_proxy = "$no_proxy,shipyardserver.local,node1.local,node2.local,registry1.local"
+    server1_config.vm.network :forwarded_port, host: 45680, guest: 80
     server1_config.vm.hostname = "shipyardserver.local"
     server1_config.ssh.forward_agent = true
     server1_config.vm.provider "virtualbox" do |v|
@@ -43,9 +43,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     node1_config.vm.box = BOX_NAME
     node1_config.vm.box_url = BOX_URI
     node1_config.vm.network :private_network, ip: "10.1.42.10"
-	#node1_config.proxy.http  = "http://<username>:<password>@<proxy_host>:<proxy_port>"
-	#node1_config.proxy.https = "http://<username>:<password>@<proxy_host>:<proxy_port>"
-	node1_config.proxy.no_proxy = "$no_proxy,shipyardserver.local,node1.local,node2.local"
+	node1_config.proxy.http  = "http://www-proxy.ericsson.se:8080"
+	node1_config.proxy.https = "http://www-proxy.ericsson.se:8080"    
+	node1_config.proxy.no_proxy = "$no_proxy,shipyardserver.local,node1.local,node2.local,registry1.local"
     node1_config.vm.hostname = "node1.local"
     node1_config.ssh.forward_agent = true
     #node1_config.vm.provision "docker"
@@ -62,9 +62,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     node2_config.vm.box = BOX_NAME
     node2_config.vm.box_url = BOX_URI
     node2_config.vm.network :private_network, ip: "10.1.42.20"
-	#node2_config.proxy.http  = "http://<username>:<password>@<proxy_host>:<proxy_port>"
-	#node2_config.proxy.https = "http://<username>:<password>@<proxy_host>:<proxy_port>"    
-	node2_config.proxy.no_proxy = "$no_proxy,shipyardserver.local,node1.local,node2.local"    
+	node2_config.proxy.http  = "http://www-proxy.ericsson.se:8080"
+	node2_config.proxy.https = "http://www-proxy.ericsson.se:8080"    
+	node2_config.proxy.no_proxy = "$no_proxy,shipyardserver.local,node1.local,node2.local,registry1.local"    
     node2_config.vm.hostname = "node2.local"
     node2_config.ssh.forward_agent = true
     node2_config.vm.provider "virtualbox" do |v|
@@ -77,10 +77,30 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end
 
+  config.vm.define :registry1 do |registry1_config|
+    registry1_config.vm.box = BOX_NAME
+    registry1_config.vm.box_url = BOX_URI
+    registry1_config.vm.network :private_network, ip: "10.1.42.40"
+	registry1_config.proxy.http  = "http://www-proxy.ericsson.se:8080"
+	registry1_config.proxy.https = "http://www-proxy.ericsson.se:8080"    
+	registry1_config.proxy.no_proxy = "$no_proxy,shipyardserver.local,node1.local,node2.local,registry1.local"    
+    registry1_config.vm.hostname = "registry1.local"
+    registry1_config.ssh.forward_agent = true
+    registry1_config.vm.provider "virtualbox" do |v|
+      v.name = "docker-registry"
+      v.customize ["modifyvm", :id, "--memory", BOX_MEM]
+      v.customize ["modifyvm", :id, "--ioapic", "on"]
+      v.customize ["modifyvm", :id, "--cpus", "2"]
+      v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+      v.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+    end
+  end
+
   config.vm.provision :hosts do |provisioner|
         provisioner.add_host '10.1.42.10', ['node1.local']
         provisioner.add_host '10.1.42.20', ['node2.local']
         provisioner.add_host '10.1.42.30', ['shipyardserver.local']
+        provisioner.add_host '10.1.42.40', ['registry1.local']
   end
   config.vm.provision :ansible do |ansible|
 	    ansible.playbook = "./site.yml"
@@ -88,35 +108,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		ansible.groups = {
 		  "shipyard-servers" => ["server1"],
 		  "shipyard-agents" => ["node1", "node2"],
-		  "all_groups:children" => ["shipyard-servers", "shipyard-agents"]		  		  
+		  "docker-registry-servers" => ["registry1"],
+		  "all_groups:children" => ["shipyard-servers", "shipyard-agents", "docker-registry-servers"]		  		  
 		}
 		ansible.extra_vars = {
 			# Please note the shipyard_server_url tries a dns lookup and 
 			# fails when running in vagrant mode hence using ip instead.
 			shipyard_server_url: "http://10.1.42.30:8000",
 			is_vagrant_run: true,
-			no_proxy: "localhost,127.0.0.0/8,shipyardserver.local,node1.local,node2.local"
+			no_proxy: "localhost,127.0.0.0/8,shipyardserver.local,node1.local,node2.local,registry1.local"
 		}
   end
 
-  #config.vm.provision "docker"
-
-  # Share an additional folder to the guest VM. The first argument is
-  # the path on the host to the actual folder. The second argument is
-  # the path on the guest to mount the folder. And the optional third
-  # argument is a set of non-required options.
-  # config.vm.synced_folder "../data", "/vagrant_data"
-
-  # Provider-specific configuration so you can fine-tune various
-  # backing providers for Vagrant. These expose provider-specific options.
-  # Example for VirtualBox:
-  #
-  # config.vm.provider :virtualbox do |vb|
-  #   # Don't boot with headless mode
-  #   vb.gui = true
-  #
-  #   # Use VBoxManage to customize the VM. For example to change memory:
-  #   vb.customize ["modifyvm", :id, "--memory", "1024"]
-  # end
-  #
 end

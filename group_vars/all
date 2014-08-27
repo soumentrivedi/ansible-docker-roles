@@ -24,10 +24,15 @@ docker_custom_opts:
  - -H tcp://0.0.0.0:4243
  - -H unix:///var/run/docker.sock
  - --restart=false 
- - -g /home/docker 
+ - -g /home/docker
+ - --dns 137.58.71.251 
+ - --dns 137.58.65.3 
+ - --dns 172.17.253.5 
+ - --dns 130.100.199.242 
+ - --dns 130.100.199.250 
     
 # http_proxy: http://<username>:<password>@<proxy_host>:<proxy_port>
-http_proxy: 
+http_proxy: http://www-proxy.ericsson.se:8080
 no_proxy: 
  - localhost
  - 127.0.0.0/8  
@@ -43,3 +48,12 @@ project_root: /opt
 # Also refer rebuild_local_container variable in the respective role 
 # vars file that would enable only selective containers to be rebuilt.
 rebuild_all_containers: false
+
+# Use this option very carefully as enabling this would cause
+# containers configurations to be rebuilt every time this is set
+# to true, default behavior is build Container configuration during
+# First Run. When upgrading the container config or recovering from DR,
+# this option would need to be set as true.
+# Also refer update_local_config variable in the respective role 
+# vars file that would enable only selective container config to be refreshed.
+update_all_config: false

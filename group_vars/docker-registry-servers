@@ -4,6 +4,13 @@ docker_image_name: docker-registry/master
 docker_host_registry_port: 5000
 docker_registry_data_dir: docker-registry-data
 
+#Shipyard configurations
+agent_host_port: 4500
+shipyard_agent_image: shipyard/agent
+shipyard_agent_service: shipyard-agent
+shipyard_server_url: http://137.58.70.157:8000
+
+
 # Use this option very carefully as enabling this would cause
 # container(s) to be rebuilt every time this is set to true, 
 # default behavior is Build Container during First Run, followed 

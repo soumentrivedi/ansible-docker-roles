@@ -15,7 +15,7 @@
     docker: 
       image: "{{ shipyard_lb_image }}"
       ports: 
-        - "{{ http_lb_port }}:80"        
+        - "{{ http_lb_port }}:{{ http_lb_port }}"        
       name: "{{ shipyard_lb_service }}"
       links: 
         - "{{ shipyard_redis_service }}:redis"
@@ -27,8 +27,8 @@
     docker: 
       image: "{{ shipyard_lb_image }}"
       ports: 
-        - "{{ http_lb_port }}:80"        
-        - "{{ https_lb_port }}:443"
+        - "{{ http_lb_port }}:{{ http_lb_port }}"        
+        - "{{ https_lb_port }}:{{ https_lb_port }}"
       name: "{{ shipyard_lb_service }}"      
       links: 
         - "{{ shipyard_redis_service }}:redis"
@@ -55,8 +55,8 @@
     with_items: docker_containers       
          
 -   name: "write {{ shipyard_lb_service }} default configuration in /etc/default/"
-    template: src="{{ shipyard_lb_service }}.default.j2" dest="/etc/default/{{ shipyard_lb_service }}"
+    template: src="{{ shipyard_lb_service }}.default.j2" dest="/etc/default/{{ shipyard_lb_service }}"    
 
 -   name: "write {{ shipyard_lb_service }} as init script in /etc/init.d/"
-    template: src="{{ shipyard_lb_service }}.j2" dest="/etc/init.d/{{ shipyard_lb_service }}" mode=0755 
+    template: src="{{ shipyard_lb_service }}.j2" dest="/etc/init.d/{{ shipyard_lb_service }}" mode=0755    
     notify: restart {{ shipyard_lb_service }}
