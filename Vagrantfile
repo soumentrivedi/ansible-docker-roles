@@ -115,7 +115,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			# Please note the shipyard_server_url tries a dns lookup and 
 			# fails when running in vagrant mode hence using ip instead.
 			shipyard_server_url: "http://10.1.42.30:8000",
-			is_vagrant_run: true,
+			is_dev_mode: true,
 			no_proxy: "localhost,127.0.0.0/8,shipyardserver.local,node1.local,node2.local,registry1.local"
 		}
   end

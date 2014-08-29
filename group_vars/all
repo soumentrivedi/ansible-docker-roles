@@ -21,6 +21,7 @@ docker_pips:
     -   docker-py
 
 docker_custom_opts: 
+ - --bip=10.123.1.1/24
  - -H tcp://0.0.0.0:4243
  - -H unix:///var/run/docker.sock
  - --restart=false 
@@ -38,6 +39,8 @@ no_proxy:
  - 127.0.0.0/8  
 enable_ssh: true
 project_root: /opt
+
+is_dev_mode: false
 
 # Use this option very carefully as enabling this would cause
 # containers to be rebuilt every time this is set to true, 
@@ -57,3 +60,13 @@ rebuild_all_containers: false
 # Also refer update_local_config variable in the respective role 
 # vars file that would enable only selective container config to be refreshed.
 update_all_config: false
+
+# Default webserver-vhost config, this can be overridden in the respect role vars file
+base_service: vhosts
+apache_enablerepo: ""
+apache_listen_port: 80
+apache_create_vhosts: true
+apache_vhosts:
+  # Additional properties: 'serveradmin, extra_parameters, loglevel'.
+  - {servername: "local.dev", serveralias: "http://local.dev", proxyurl: "http://localhost:8000/", location: {"*"}} 
+  

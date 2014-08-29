@@ -1,7 +1,23 @@
-# Docker Registry Upstart and SysVinit configuration file
+# {{ ansible_managed }}
+# defaults for {{ init_service_name }} server
 
-# Customize location of Docker binary.
-DOCKER="/usr/bin/docker"
+# pulled in from the init script; makes things easier.
+NAME={{ init_service_name }}
 
-# Use DOCKER_OPTS to modify the daemon startup options.
-DOCKER_REGISTRY_OPTS="start -a"
+# Timeout for killing containers if not stopped within the specified timeout 'N' seconds
+TIMEOUT=5
+
+# user and group to be invoked as (default to root)
+REGISTRY_USER=root
+REGISTRY_GROUP=root
+
+# docker home location
+DOCKER=/usr/bin/docker
+
+# log location.  this may be a syslog facility.priority
+REGISTRY_LOG=/var/log/$NAME.log
+
+# port for REGISTRY connector (default {{ docker_host_registry_port }}; disable with -1)
+REGISTRY_PORT={{ docker_host_registry_port }}
+
+REGISTRY_ARGS="{{ init_service_name }}"

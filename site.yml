@@ -11,8 +11,8 @@
 - hosts: shipyard-agents  
   user: vagrant
   sudo: yes  
-  roles:    
-    - shipyard-agent
+#  roles:    
+#    - shipyard-agent
       
 ## This role deploys a docker registry
 - hosts: docker-registry-servers
@@ -20,6 +20,7 @@
   sudo: yes
   roles:
     - docker-registry
+    - webserver-vhost
     - shipyard-agent
  
 # This role deploys a shipyard server

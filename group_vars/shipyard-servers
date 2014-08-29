@@ -54,3 +54,9 @@ rebuild_local_container: false
 # Also refer update_all_config variable in the global all 
 # vars file that would enable all container config to be refreshed.
 update_local_config: false
+
+base_service: shipyard
+
+apache_vhosts:
+  # Additional properties: 'serveradmin, extra_parameters, loglevel'.
+ - {servername: "shipyard-server-satv.tandbergtv.lan", serveralias: "http://shipyard-server-satv.tandbergtv.lan", proxyurl: "http://localhost:8000/", location: {"*"}, serveradmin: "soumen.trivedi@ericsson.com"}

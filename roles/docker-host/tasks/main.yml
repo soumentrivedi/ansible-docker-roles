@@ -13,7 +13,7 @@
     register: docker_default_file
 
 -   name: Creating reference for extended DOCKER_OPTS
-    lineinfile: dest={{ docker_default }} line=". {{ default_conf }}/docker.ext" insertafter="^DOCKER_OPTS=(.*)"
+    lineinfile: dest={{ docker_default }} line=". {{ default_conf }}/docker.ext" insertafter="(.*)DOCKER_OPTS=(.*)"
     when: docker_default_file.stat.exists
     register: docker_ext_action 
       

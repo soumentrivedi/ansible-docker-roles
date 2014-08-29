@@ -10,11 +10,14 @@
 
 -   name: "write Dockerfile in {{ project_root }}/docker-registry/"
     template: src=Dockerfile.j2 dest={{ project_root }}/docker-registry/Dockerfile
+
+-   name: "write Gunicorn config in {{ project_root }}/docker-registry/"
+    template: src=gunicorn-config.py.j2 dest={{ project_root }}/docker-registry/gunicorn-config.py
     
 -   name: check or build image
     docker_image: path="{{ project_root }}/docker-registry/" name="{{ docker_image_name }}" state=present
 
--   stat: path=/etc/init/{{ init_service_name }}.conf
+-   stat: path=/etc/init.d/{{ init_service_name }}
     register: init_service
              
 -   name: clearing {{ docker_image_name }} containers
@@ -27,11 +30,17 @@
     when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
             
 -   name: run {{ docker_image_name }} containers
-    docker: image="{{ docker_image_name }}" ports="{{ docker_host_registry_port }}:5000" volumes="{{ project_root }}/{{ docker_registry_data_dir }}:/{{ docker_registry_data_dir }}" name="{{ init_service_name }}" state=running
+    docker:
+      image: "{{ docker_image_name }}" 
+      ports:
+        - "{{ docker_host_registry_port }}:{{ docker_registry_port }}" 
+      volumes: "{{ project_root }}/{{ docker_registry_data_dir }}:/{{ docker_registry_data_dir }}" 
+      name: "{{ init_service_name }}" 
+      state: running      
     when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
         
 -   name: Display return codes from running containers
-    debug: msg="Returned {{inventory_hostname}}:{{item}}"
+    debug: msg="Returned {{ inventory_hostname }}:{{ item }}"
     with_items: docker_containers       
     when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
         
@@ -43,11 +52,10 @@
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
     when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
-                 
--   name: "write {{ init_service_name }} default configuration in /etc/default/"
-    template: src=docker-registry.default.j2 dest=/etc/default/{{ init_service_name }}
 
--   name: "write {{ init_service_name }} as init script in /etc/init/"
-    template: src=docker-registry.conf.j2 dest=/etc/init/{{ init_service_name }}.conf
-    notify:
-    - restart {{ init_service_name }}
+-   name: "write {{ init_service_name }} default configuration in /etc/default/"
+    template: src="{{ init_service_name }}.default.j2" dest="/etc/default/{{ init_service_name }}"   
+        
+-   name: "write {{ init_service_name }} as init script in /etc/init.d/"
+    template: src="{{ init_service_name }}.j2" dest="/etc/init.d/{{ init_service_name }}" mode=0755    
+    notify: restart {{ init_service_name }}                

@@ -1,10 +1,22 @@
 project_name: docker-registry
 init_service_name: docker-registry
 docker_image_name: docker-registry/master    
+# This is the host port used to map into docker container
 docker_host_registry_port: 5000
 docker_registry_data_dir: docker-registry-data
 
-#Shipyard configurations
+# Settings for Docker Registry Gunicorn
+registry_settings_mode: prod
+docker_registry_host: 0.0.0.0
+# This is the docker port used inside docker container to serve the application
+docker_registry_port: 5000
+registry_timeout: 3600
+registry_log_level: info
+registry_access_log: "/{{ docker_registry_data_dir }}/{{ init_service_name }}_access.log"
+registry_error_log: "/{{ docker_registry_data_dir }}/{{ init_service_name }}_error.log"
+registry_application_name: docker_registry.wsgi:application
+
+#Shipyard Agent configurations
 agent_host_port: 4500
 shipyard_agent_image: shipyard/agent
 shipyard_agent_service: shipyard-agent
@@ -20,3 +32,9 @@ shipyard_server_url: http://137.58.70.157:8000
 # Also refer rebuild_all_containers variable in the global 
 # all vars file that would override this and build all containers.
 rebuild_local_container: false
+
+base_service: docker-registry
+
+apache_vhosts:
+  # Additional properties: 'serveradmin, extra_parameters, loglevel'.
+ - {servername: "docker-registry-satv.tandbergtv.lan", serveralias: "http://docker-registry-satv.tandbergtv.lan", proxyurl: "http://localhost:5000/", location: {"/v1/_ping", "/_ping"}, serveradmin: "soumen.trivedi@ericsson.com"}

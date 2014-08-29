@@ -1,9 +1,15 @@
 ---
 -   name: Adding docker apt_key
     apt_key: keyserver={{ apt_key_server }} id={{ apt_key }}
+    environment:
+      http_proxy: "{{ http_proxy }}"
+      https_proxy: "{{ https_proxy }}"    
 
 -   name: Add docker repository into sources list.
     apt_repository: repo='{{ apt_repo }}' state=present update_cache=yes
+    environment:
+      http_proxy: "{{ http_proxy }}"
+      https_proxy: "{{ https_proxy }}"    
 
 -   name: install docker
     apt: pkg={{ docker_package }} state=installed

@@ -38,13 +38,15 @@ run pip install /docker-registry/depends/docker-registry-core
 run pip install file:///docker-registry#egg=docker-registry[bugsnag,newrelic]
 
 env DOCKER_REGISTRY_CONFIG /docker-registry/config/config.yml
-env SETTINGS_FLAVOR prod
+env SETTINGS_FLAVOR {{ registry_settings_mode }}
+env GUNICORN_ACCESS_LOG_FILE {{ registry_access_log }}
+env GUNICORN_ERROR_LOG_FILE {{ registry_error_log }}
 
-expose 5000
+expose {{ docker_registry_port }}
 
 {% if enable_ssh %}
 	expose 22
 {% endif %}
 
-
-cmd exec docker-registry
+workdir /docker-registry
+cmd gunicorn -c gunicorn-config.py {{ registry_application_name }}

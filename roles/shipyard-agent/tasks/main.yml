@@ -26,7 +26,7 @@
       env: "URL={{ shipyard_server_url }},IP={{ ansible_default_ipv4.address }}"       
       volumes: "/var/run/docker.sock:/docker.sock"
       state: running
-    when: (not init_service.stat.exists or rebuild_local_container or rebuild_all_containers) and not is_vagrant_run 
+    when: (not init_service.stat.exists or rebuild_local_container or rebuild_all_containers) and not is_dev_mode 
     
 -   name: run {{ shipyard_agent_service }} containers
     docker: 
@@ -37,7 +37,7 @@
       env: "URL={{ shipyard_server_url }},IP={{ ansible_eth1.ipv4.address }},http_proxy="       
       volumes: "/var/run/docker.sock:/docker.sock"
       state: running
-    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers and is_vagrant_run
+    when: (not init_service.stat.exists or rebuild_local_container or rebuild_all_containers) and is_dev_mode
     
 -   name: Display return codes from running containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
