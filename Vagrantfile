@@ -7,6 +7,7 @@ VAGRANTFILE_API_VERSION = "2"
 BOX_MEM = "1024"
 BOX_NAME =  "precise64"
 BOX_URI = "http://files.vagrantup.com/precise64.box"
+NO_PROXY_HOSTS = "$no_proxy,localhost,127.0.0.0/8,shipyardserver.local,node1.local,node2.local,registry1.local"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # All Vagrant configuration is done here. The most common configuration
@@ -22,10 +23,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define :server1 do |server1_config|
     server1_config.vm.box = BOX_NAME
     server1_config.vm.box_url = BOX_URI
-    server1_config.vm.network :private_network, ip: "10.1.42.30"
-	server1_config.proxy.http  = "http://www-proxy.ericsson.se:8080"
-	server1_config.proxy.https = "http://www-proxy.ericsson.se:8080"    	    
-	server1_config.proxy.no_proxy = "$no_proxy,shipyardserver.local,node1.local,node2.local,registry1.local"
+    server1_config.vm.network :private_network, ip: "10.1.42.30"    	    
+	server1_config.proxy.no_proxy = NO_PROXY_HOSTS
     server1_config.vm.network :forwarded_port, host: 45680, guest: 80
     server1_config.vm.hostname = "shipyardserver.local"
     server1_config.ssh.forward_agent = true
@@ -42,10 +41,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define :node1 do |node1_config|
     node1_config.vm.box = BOX_NAME
     node1_config.vm.box_url = BOX_URI
-    node1_config.vm.network :private_network, ip: "10.1.42.10"
-	node1_config.proxy.http  = "http://www-proxy.ericsson.se:8080"
-	node1_config.proxy.https = "http://www-proxy.ericsson.se:8080"    
-	node1_config.proxy.no_proxy = "$no_proxy,shipyardserver.local,node1.local,node2.local,registry1.local"
+    node1_config.vm.network :private_network, ip: "10.1.42.10"    
+	node1_config.proxy.no_proxy = NO_PROXY_HOSTS
     node1_config.vm.hostname = "node1.local"
     node1_config.ssh.forward_agent = true
     #node1_config.vm.provision "docker"
@@ -61,10 +58,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define :node2 do |node2_config|
     node2_config.vm.box = BOX_NAME
     node2_config.vm.box_url = BOX_URI
-    node2_config.vm.network :private_network, ip: "10.1.42.20"
-	node2_config.proxy.http  = "http://www-proxy.ericsson.se:8080"
-	node2_config.proxy.https = "http://www-proxy.ericsson.se:8080"    
-	node2_config.proxy.no_proxy = "$no_proxy,shipyardserver.local,node1.local,node2.local,registry1.local"    
+    node2_config.vm.network :private_network, ip: "10.1.42.20" 
+	node2_config.proxy.no_proxy = NO_PROXY_HOSTS    
     node2_config.vm.hostname = "node2.local"
     node2_config.ssh.forward_agent = true
     node2_config.vm.provider "virtualbox" do |v|
@@ -81,9 +76,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     registry1_config.vm.box = BOX_NAME
     registry1_config.vm.box_url = BOX_URI
     registry1_config.vm.network :private_network, ip: "10.1.42.40"
-	registry1_config.proxy.http  = "http://www-proxy.ericsson.se:8080"
-	registry1_config.proxy.https = "http://www-proxy.ericsson.se:8080"    
-	registry1_config.proxy.no_proxy = "$no_proxy,shipyardserver.local,node1.local,node2.local,registry1.local"    
+	registry1_config.proxy.no_proxy = NO_PROXY_HOSTS    
     registry1_config.vm.hostname = "registry1.local"
     registry1_config.ssh.forward_agent = true
     registry1_config.vm.provider "virtualbox" do |v|
@@ -116,7 +109,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			# fails when running in vagrant mode hence using ip instead.
 			shipyard_server_url: "http://10.1.42.30:8000",
 			is_dev_mode: true,
-			no_proxy: "localhost,127.0.0.0/8,shipyardserver.local,node1.local,node2.local,registry1.local"
+			no_proxy: NO_PROXY_HOSTS
 		}
   end
 
