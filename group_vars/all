@@ -12,6 +12,7 @@ ubuntu_packages:
     -   libevent-dev
     -   python-openssl
     -   python-setuptools
+    -   bridge-utils
 
 kernel_packages:
     -   linux-image-generic-lts-raring
@@ -20,8 +21,12 @@ kernel_packages:
 docker_pips:
     -   docker-py
 
+# Notifying Docker to use custom subnet when provisioning docker containers
+default_docker_bridge: docker0
+custom_bridge_subnet: 10.123.1.1/24
+
 docker_custom_opts: 
- - --bip=10.123.1.1/24
+ - "--bip={{ custom_bridge_subnet }}"
  - -H tcp://0.0.0.0:4243
  - -H unix:///var/run/docker.sock
  - --restart=false 
@@ -33,7 +38,7 @@ docker_custom_opts:
  - --dns 130.100.199.250 
     
 # http_proxy: http://<username>:<password>@<proxy_host>:<proxy_port>
-http_proxy: http://www-proxy.ericsson.se:8080
+http_proxy:
 no_proxy: 
  - localhost
  - 127.0.0.0/8  

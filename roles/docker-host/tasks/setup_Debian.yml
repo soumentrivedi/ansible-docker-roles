@@ -3,7 +3,8 @@
     apt_key: keyserver={{ apt_key_server }} id={{ apt_key }}
     environment:
       http_proxy: "{{ http_proxy }}"
-      https_proxy: "{{ https_proxy }}"    
+      https_proxy: "{{ https_proxy }}"  
+    when: http_proxy is defined or https_proxy is defined    
 
 -   name: Add docker repository into sources list.
     apt_repository: repo='{{ apt_repo }}' state=present update_cache=yes
@@ -16,3 +17,22 @@
 
 -   name: Creating extended DOCKER_OPTS
     template: src=docker.ext.j2 dest={{ default_conf }}/docker.ext
+    
+-   name: Identifying docker bridge interface subnet
+    command: "ip addr show {{ default_docker_bridge }} | grep -F 'inet' | awk '{ print $2; }'"    
+    register: docker_bridge_subnet
+    when: custom_bridge_subnet is defined
+    
+-   name: Comparing Subnet of default docker vs {{ custom_bridge_subnet }}
+    command: /bin/false    
+    when: docker_bridge_subnet.stdout == {{ custom_bridge_subnet }}
+    register: create_custom_bridge
+    
+-   name: Disable docker device
+    command: ip link set dev {{ default_docker_bridge }} down
+    when: create_custom_bridge
+    
+-   name: Delete bridge {{ default_docker_bridge }}
+    command: brctl delbr {{ default_docker_bridge }}
+    when: create_custom_bridge
+             
