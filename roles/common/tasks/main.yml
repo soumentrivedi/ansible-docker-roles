@@ -2,6 +2,9 @@
 -   name: Run the equivalent of "apt-get update" as a separate step
     apt: update_cache=yes
 
+-   name: "write http_proxy in /etc/profile.d/"
+    template: src="http_proxy.j2" dest="/etc/profile.d/http_proxy"       
+    
 -   name: setting up base platform for hosting docker containers
     apt: name={{ item }} state=installed
     when: ansible_distribution == 'Ubuntu'
