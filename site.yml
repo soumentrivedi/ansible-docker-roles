@@ -5,7 +5,6 @@
   gather_facts: yes
   roles:
     - common  
-    - docker-host
 
 ## This role deploys shipyard-agents
 - hosts: shipyard-agents  
