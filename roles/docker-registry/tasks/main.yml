@@ -38,12 +38,7 @@
       name: "{{ init_service_name }}" 
       state: running      
     when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
-        
--   name: Display return codes from running containers
-    debug: msg="Returned {{ inventory_hostname }}:{{ item }}"
-    with_items: docker_containers       
-    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
-        
+              
 -   name: stop {{ docker_image_name }} containers
     docker: image="{{ docker_image_name }}"  state=stopped
     when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
