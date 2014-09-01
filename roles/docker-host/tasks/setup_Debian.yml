@@ -36,4 +36,7 @@
 -   name: Delete bridge {{ default_docker_bridge }}
     command: brctl delbr {{ default_docker_bridge }}
     when: create_custom_bridge|failed
-             
+
+-   name: restart-docker
+    service: name={{ docker_service }} state=restarted
+    when: create_custom_bridge|failed             
