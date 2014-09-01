@@ -3,7 +3,8 @@
     apt: update_cache=yes
 
 -   name: "write http_proxy in /etc/profile.d/"
-    template: src="http_proxy.j2" dest="/etc/profile.d/http_proxy"       
+    template: src="http_proxy.j2" dest="/etc/profile.d/http_proxy"
+    when: http_proxy is defined or https_proxy is defined or no_proxy is defined       
     
 -   name: setting up base platform for hosting docker containers
     apt: name={{ item }} state=installed
