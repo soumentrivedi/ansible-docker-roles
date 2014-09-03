@@ -1,5 +1,7 @@
 host: "{{inventory_hostname}}"
 
+restart_delay: 60
+
 common_packages:
     -   git
     -   python-pip
@@ -20,7 +22,7 @@ kernel_packages:
 
 docker_pips:
     -   docker-py
-
+    
 # Notifying Docker to use custom subnet when provisioning docker containers
 default_docker_bridge: docker0
 custom_bridge_subnet: 10.123.1.1/24

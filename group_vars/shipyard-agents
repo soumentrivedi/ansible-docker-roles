@@ -4,7 +4,7 @@ agent_host_port: 4500
 # Docker Image Name
 shipyard_agent_image: shipyard/agent
 shipyard_agent_service: shipyard-agent
-shipyard_server_url: http://137.58.70.157:8000
+shipyard_server_url: http://shipyard-server/
 
 # Use this option very carefully as enabling this would cause
 # container(s) to be rebuilt every time this is set to true, 

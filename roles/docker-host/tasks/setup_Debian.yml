@@ -15,28 +15,37 @@
 -   name: install docker
     apt: pkg={{ docker_package }} state=installed
 
+-   name: Check Docker existence
+    stat: path={{ docker_default }}
+    register: docker_default_file
+
 -   name: Creating extended DOCKER_OPTS
     template: src=docker.ext.j2 dest={{ default_conf }}/docker.ext
-    
+
+-   name: Creating reference for extended DOCKER_OPTS
+    lineinfile: dest={{ docker_default }} line=". {{ default_conf }}/docker.ext" insertafter="(.*)DOCKER_OPTS=(.*)"
+    when: docker_default_file.stat.exists
+    register: docker_ext_action 
+   
 -   name: Identifying docker bridge interface subnet
     shell: "ip addr show {{ default_docker_bridge }} | grep -F 'inet' | awk '{ print $2; }'"    
     register: docker_bridge_subnet
     when: custom_bridge_subnet is defined
     
 -   name: Comparing Subnet of default docker vs {{ custom_bridge_subnet }}
-    command: /bin/false    
-    when: not docker_bridge_subnet.stdout == "{{ custom_bridge_subnet }}"
+    command: /bin/true    
+    when: docker_bridge_subnet.stdout != "" and docker_bridge_subnet.stdout.find("{{ custom_bridge_subnet }}") == -1
     register: create_custom_bridge
-    ignore_errors: True
     
--   name: Disable docker device
-    command: ip link set dev {{ default_docker_bridge }} down
-    when: create_custom_bridge|failed
+-   name: stop-docker
+    service: name={{ docker_service }} state=stopped
+    when: create_custom_bridge|changed   
     
--   name: Delete bridge {{ default_docker_bridge }}
-    command: brctl delbr {{ default_docker_bridge }}
-    when: create_custom_bridge|failed
+-   name: Disable and delete docker bridge interface    
+    shell: ip link set dev {{ default_docker_bridge }} down && brctl delbr {{ default_docker_bridge }}
+    when: create_custom_bridge|changed    
 
--   name: restart-docker
-    service: name={{ docker_service }} state=restarted
-    when: create_custom_bridge|failed             
+-   name: start-docker
+    service: name={{ docker_service }} state=started
+    when: create_custom_bridge|changed  
+             

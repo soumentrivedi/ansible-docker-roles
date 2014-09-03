@@ -20,7 +20,7 @@ registry_application_name: docker_registry.wsgi:application
 agent_host_port: 4500
 shipyard_agent_image: shipyard/agent
 shipyard_agent_service: shipyard-agent
-shipyard_server_url: http://137.58.70.157:8000
+shipyard_server_url: http://shipyard-server/
 
 
 # Use this option very carefully as enabling this would cause

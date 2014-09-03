@@ -2,10 +2,6 @@
 -   name: Run the equivalent of "apt-get update" as a separate step
     apt: update_cache=yes
 
--   name: "write http_proxy in /etc/profile.d/"
-    template: src="http_proxy.j2" dest="/etc/profile.d/http_proxy"
-    when: http_proxy is defined or https_proxy is defined or no_proxy is defined       
-    
 -   name: setting up base platform for hosting docker containers
     apt: name={{ item }} state=installed
     when: ansible_distribution == 'Ubuntu'
@@ -26,16 +22,31 @@
     when: kernelup.changed
 
 -   name: Wait for server to come up
-    local_action: wait_for host={{ansible_ssh_host}} port={{ansible_ssh_port}} delay=30
+    local_action: wait_for host={{ansible_ssh_host}} port={{ansible_ssh_port}} delay={{ restart_delay }}
     sudo: false    
     when: kernelup.changed
 
 -   name: installing pip modules
     pip: name={{ item }} state=present
     when: ansible_distribution == 'Ubuntu'
+    environment: 
+      http_proxy: "{{ http_proxy }}"
+      https_proxy: "{{ http_proxy }}"
+      no_proxy: "{{ no_proxy }}" 
     with_items:    
     - "{{ docker_pips }}"
+    when: https_proxy is not defined
 
+-   name: installing pip modules
+    pip: name={{ item }} state=present
+    when: ansible_distribution == 'Ubuntu'
+    environment: 
+      http_proxy: "{{ http_proxy }}"
+      https_proxy: "{{ https_proxy }}"
+      no_proxy: "{{ no_proxy }}" 
+    with_items:    
+    - "{{ docker_pips }}"
+    when: https_proxy is defined
 -   name: Run the equivalent of "apt-get update" as a separate step
     apt: update_cache=yes
             
