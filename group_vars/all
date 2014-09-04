@@ -40,7 +40,7 @@ docker_custom_opts:
  - --dns 130.100.199.250 
     
 # http_proxy: http://<username>:<password>@<proxy_host>:<proxy_port>
-# http_proxy: "http://www-proxy.ericsson.se:8080"
+http_proxy:
 no_proxy: 
  - localhost
  - 127.0.0.0/8  

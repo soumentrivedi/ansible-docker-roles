@@ -18,15 +18,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.box = BOX_NAME
     config.vm.box_url = BOX_URI
 	config.vm.box_download_insecure = true
+    config.ssh.forward_agent = true
+	config.proxy.no_proxy = NO_PROXY_HOSTS
   
-  # The url from where the 'config.vm.box' box will be fetched if it
-  # doesn't already exist on the user's system.
-  # config.vm.box_url = "http://files.vagrantup.com/precise64.box"
   config.vm.define :server1 do |server1_config|
     server1_config.vm.network :private_network, ip: "10.1.42.30"
     server1_config.vm.network :forwarded_port, host: 45680, guest: 80
     server1_config.vm.hostname = "shipyardserver.local"
-    server1_config.ssh.forward_agent = true
     server1_config.vm.provider "virtualbox" do |v|
       v.name = "shipyardserver"
       v.customize ["modifyvm", :id, "--memory", 4096]
@@ -40,8 +38,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define :node1 do |node1_config|
     node1_config.vm.network :private_network, ip: "10.1.42.10"
     node1_config.vm.hostname = "node1.local"
-    node1_config.ssh.forward_agent = true
-    #node1_config.vm.provision "docker"
     node1_config.vm.provider "virtualbox" do |v|
       v.name = "shipyard-agent-node1"
       v.customize ["modifyvm", :id, "--memory", BOX_MEM]
@@ -54,7 +50,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define :node2 do |node2_config|
     node2_config.vm.network :private_network, ip: "10.1.42.20"
     node2_config.vm.hostname = "node2.local"
-    node2_config.ssh.forward_agent = true
     node2_config.vm.provider "virtualbox" do |v|
       v.name = "shipyard-agent-node2"
       v.customize ["modifyvm", :id, "--memory", BOX_MEM]
@@ -69,7 +64,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     registry1_config.vm.network :private_network, ip: "10.1.42.40"
 	registry1_config.vm.network :forwarded_port, host: 45681, guest: 80    
     registry1_config.vm.hostname = "registry1.local"
-    registry1_config.ssh.forward_agent = true
     registry1_config.vm.provider "virtualbox" do |v|
       v.name = "docker-registry"
       v.customize ["modifyvm", :id, "--memory", BOX_MEM]
