@@ -9,8 +9,8 @@ bind = '%s:%s' % (
     os.environ.get('REGISTRY_HOST', '{{ docker_registry_host }}'),
     os.environ.get('REGISTRY_PORT', '{{ docker_registry_port }}')
 )
-graceful_timeout = {{ registry_timeout }}
-timeout = {{ registry_timeout }}
+graceful_timeout = {{registry_timeout}}
+timeout = {{registry_timeout}}
 worker_class = 'gevent'
 max_requests = 100
 workers = 5
@@ -24,5 +24,5 @@ access_log_format = ('%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" '
 if flavor == 'prod' or flavor == 'staging':
     reload = False
     workers = 8
-    debug = False
+    debug = True
     log_level = '{{ registry_log_level }}'

@@ -12,8 +12,13 @@
       http_proxy: "{{ http_proxy }}"
       https_proxy: "{{ https_proxy }}"    
 
+-   name: install docker with version {{ docker_version }}
+    apt: name={{ docker_package }}-{{ docker_version }} state=installed
+    when: docker_version is defined
+
 -   name: install docker
     apt: pkg={{ docker_package }} state=installed
+    when: docker_version is not defined
 
 -   name: Check Docker existence
     stat: path={{ docker_default }}

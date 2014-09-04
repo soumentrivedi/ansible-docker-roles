@@ -22,12 +22,12 @@
              
 -   name: clearing {{ docker_image_name }} containers
     docker: image="{{ docker_image_name }}"  state=absent
-    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    when: not init_service.stat.exists or rebuild_docker_registry_container or rebuild_all_containers
         
 -   name: Display return codes from cleared containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
-    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    when: not init_service.stat.exists or rebuild_docker_registry_container or rebuild_all_containers
             
 -   name: run {{ docker_image_name }} containers
     docker:
@@ -36,17 +36,18 @@
         - "{{ docker_host_registry_port }}:{{ docker_registry_port }}" 
       volumes: "{{ project_root }}/{{ docker_registry_data_dir }}:/{{ docker_registry_data_dir }}" 
       name: "{{ init_service_name }}" 
+      hostname: "{{ ansible_hostname }}"
       state: running      
-    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
-              
+    when: not init_service.stat.exists or rebuild_docker_registry_container or rebuild_all_containers
+        
 -   name: stop {{ docker_image_name }} containers
     docker: image="{{ docker_image_name }}"  state=stopped
-    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    when: not init_service.stat.exists or rebuild_docker_registry_container or rebuild_all_containers
             
 -   name: Display return codes from stopped containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
-    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    when: not init_service.stat.exists or rebuild_docker_registry_container or rebuild_all_containers
 
 -   name: "write {{ init_service_name }} default configuration in /etc/default/"
     template: src="{{ init_service_name }}.default.j2" dest="/etc/default/{{ init_service_name }}"   
@@ -54,3 +55,7 @@
 -   name: "write {{ init_service_name }} as init script in /etc/init.d/"
     template: src="{{ init_service_name }}.j2" dest="/etc/init.d/{{ init_service_name }}" mode=0755    
     notify: restart {{ init_service_name }}                
+
+-   name: restart container as containers are rebuilt
+    service: name={{ init_service_name }} state=restarted
+    when: rebuild_docker_registry_container or rebuild_all_containers

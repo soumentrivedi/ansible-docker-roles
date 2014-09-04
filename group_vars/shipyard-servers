@@ -35,7 +35,7 @@ shipyard_services:
  - "{{ shipyard_lb_service }}"
  - "{{ shipyard_db_service }}"
  - "{{ shipyard_www_service }}"
- 
+  
 # Use this option very carefully as enabling this would cause
 # container(s) to be rebuilt every time this is set to true, 
 # default behavior is Build Container during First Run, followed 
@@ -44,7 +44,7 @@ shipyard_services:
 # this option would need to be set as true.
 # Also refer rebuild_all_containers variable in the global 
 # all vars file that would override this and build all containers.
-rebuild_local_container: false 
+rebuild_shipyard_server_container: false 
 
 # Use this option very carefully as enabling this would cause
 # containers configurations to be rebuilt every time this is set

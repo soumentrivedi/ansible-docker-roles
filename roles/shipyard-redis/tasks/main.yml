@@ -4,7 +4,7 @@
   
 -   name: clearing {{ shipyard_redis_image }} containers
     docker: image="{{ shipyard_redis_image }}"  state=absent
-    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    when: not init_service.stat.exists or rebuild_shipyard_server_container or rebuild_all_containers
 
 -   name: Display return codes from cleared containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
@@ -17,7 +17,7 @@
         - "{{ redis_port }}:{{ redis_port }}"        
       name: "{{ shipyard_redis_service }}"
       state: running
-    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    when: not init_service.stat.exists or rebuild_shipyard_server_container or rebuild_all_containers
     
 -   name: Display return codes from running containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
@@ -25,7 +25,7 @@
 
 -   name: stop {{ shipyard_redis_service }} containers
     docker: image="{{ shipyard_redis_service }}"  state=stopped
-    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    when: not init_service.stat.exists or rebuild_shipyard_server_container or rebuild_all_containers
     
 -   name: Display return codes from stopped containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"

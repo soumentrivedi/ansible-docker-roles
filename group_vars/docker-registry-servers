@@ -10,7 +10,7 @@ registry_settings_mode: prod
 docker_registry_host: 0.0.0.0
 # This is the docker port used inside docker container to serve the application
 docker_registry_port: 5000
-registry_timeout: 3600
+registry_timeout: 30
 registry_log_level: info
 registry_access_log: "/{{ docker_registry_data_dir }}/{{ init_service_name }}_access.log"
 registry_error_log: "/{{ docker_registry_data_dir }}/{{ init_service_name }}_error.log"
@@ -20,8 +20,7 @@ registry_application_name: docker_registry.wsgi:application
 agent_host_port: 4500
 shipyard_agent_image: shipyard/agent
 shipyard_agent_service: shipyard-agent
-shipyard_server_url: http://shipyard-server/
-
+shipyard_server_url: http://shipyard-server-satv.tandbergtv.lan/
 
 # Use this option very carefully as enabling this would cause
 # container(s) to be rebuilt every time this is set to true, 
@@ -31,7 +30,7 @@ shipyard_server_url: http://shipyard-server/
 # this option would need to be set as true.
 # Also refer rebuild_all_containers variable in the global 
 # all vars file that would override this and build all containers.
-rebuild_local_container: false
+rebuild_docker_registry_container: false
 
 base_service: docker-registry
 

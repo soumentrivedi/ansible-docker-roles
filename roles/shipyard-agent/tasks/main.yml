@@ -10,12 +10,12 @@
     
 -   name: clearing {{ shipyard_agent_image }} containers
     docker: image="{{ shipyard_agent_image }}"  state=absent
-    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    when: not init_service.stat.exists or rebuild_shipyard_agent_container or rebuild_all_containers
 
 -   name: Display return codes from cleared containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
-    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    when: not init_service.stat.exists or rebuild_shipyard_agent_container or rebuild_all_containers
     
 -   name: run {{ shipyard_agent_service }} containers
     docker: 
@@ -26,7 +26,7 @@
       env: "URL={{ shipyard_server_url }},IP={{ ansible_default_ipv4.address }}"       
       volumes: "/var/run/docker.sock:/docker.sock"
       state: running
-    when: (not init_service.stat.exists or rebuild_local_container or rebuild_all_containers) and not is_dev_mode 
+    when: (not init_service.stat.exists or rebuild_shipyard_agent_container or rebuild_all_containers) and not is_dev_mode 
     
 -   name: run {{ shipyard_agent_service }} containers
     docker: 
@@ -37,25 +37,29 @@
       env: "URL={{ shipyard_server_url }},IP={{ ansible_eth1.ipv4.address }},http_proxy="       
       volumes: "/var/run/docker.sock:/docker.sock"
       state: running
-    when: (not init_service.stat.exists or rebuild_local_container or rebuild_all_containers) and is_dev_mode
+    when: (not init_service.stat.exists or rebuild_shipyard_agent_container or rebuild_all_containers) and is_dev_mode
     
 -   name: Display return codes from running containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
-    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    when: not init_service.stat.exists or rebuild_shipyard_agent_container or rebuild_all_containers
     
 -   name: stop {{ shipyard_agent_service }} containers
     docker: image="{{ shipyard_agent_service }}"  state=stopped
-    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    when: not init_service.stat.exists or rebuild_shipyard_agent_container or rebuild_all_containers
     
 -   name: Display return codes from stopped containers
     debug: msg="Returned {{inventory_hostname}}:{{item}}"
     with_items: docker_containers       
-    when: not init_service.stat.exists or rebuild_local_container or rebuild_all_containers
+    when: not init_service.stat.exists or rebuild_shipyard_agent_container or rebuild_all_containers
              
 -   name: "write {{ shipyard_agent_service }} default configuration in /etc/default/"
     template: src="{{ shipyard_agent_service }}.default.j2" dest="/etc/default/{{ shipyard_agent_service }}"
 
 -   name: "write {{ shipyard_agent_service }} as init script in /etc/init.d/"
     template: src="{{ shipyard_agent_service }}.j2" dest="/etc/init.d/{{ shipyard_agent_service }}" mode="0755" 
-    notify: restart {{ shipyard_agent_service }}    
+    notify: restart {{ shipyard_agent_service }}
+
+-   name: restart container as containers are rebuilt
+    service: name={{ shipyard_agent_service }} state=restarted    
+    when: rebuild_shipyard_agent_container or rebuild_all_containers

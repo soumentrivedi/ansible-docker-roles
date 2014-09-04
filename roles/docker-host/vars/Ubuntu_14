@@ -2,3 +2,4 @@
 docker_package: docker.io
 docker_service: docker.io
 docker_default: /etc/default/docker.io
+docker_version: 1.1.0

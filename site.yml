@@ -11,6 +11,7 @@
   user: vagrant
   sudo: yes  
   roles:    
+    - docker-host
     - shipyard-agent
       
 ## This role deploys a docker registry
@@ -18,15 +19,23 @@
   user: vagrant
   sudo: yes
   roles:
+    - docker-host
     - docker-registry
     - webserver-vhost
-    - shipyard-agent
  
 # This role deploys a shipyard server
 - hosts: shipyard-servers
   user: vagrant
   sudo: yes    
   roles:
+    - docker-host
     - shipyard-www
     - webserver-vhost    
+
+# This role deploys a rabbitmq server
+- hosts: rabbitmq-servers
+  user: vagrant
+  sudo: yes    
+  roles:
+    - rabbitmq
     
