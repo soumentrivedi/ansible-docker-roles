@@ -47,4 +47,5 @@
   roles:    
     - server-common
     - jenkins-base
-    - jenkins-master        
+    - jenkins-master    
+    - webserver-vhost       
