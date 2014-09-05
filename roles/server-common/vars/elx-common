@@ -1,0 +1,22 @@
+---
+elx_apt_pkgs: 
+  - python-yaml
+  - python-jinja2
+  - git
+  - openssh-server
+  - wget
+  - python-software-properties
+  - bzip2
+  - make
+  - openjdk-7-jre-headless
+  - ruby1.9.3
+  - ruby1.9.1-dev
+  - build-essential
+  - ansible
+
+elx_no_proxy:
+  - "{{ no_proxy }}"
+  - elx-install.uk.eu.ericsson.se
+  - place.holder.ericsson.se  
+  
+  

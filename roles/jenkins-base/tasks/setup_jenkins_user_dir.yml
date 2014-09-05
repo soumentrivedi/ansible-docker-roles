@@ -1,0 +1,30 @@
+---
+- name: Create jenkins group 
+  group: name=jenkins state=present
+  tags:
+   - jenkins_user
+- name: Create jenkins user
+  user: home=/home/jenkins name=jenkins group=jenkins groups=cdrom,audio,video shell=/bin/bash state=present generate_ssh_key=yes password=$6$Som3S@lt$evB/W5kPhWSOA1jiweARTERVvcAhvZU/SrRHU1Cn7sEqh3baaoDggTcrkBbEp4K.R6H.CplJSmLOg.MOe61xl.
+  tags:
+  - jenkins_user
+- name: Create /home/jenkins/libs
+  file: state=absent path=/home/jenkins/libs owner=jenkins group=jenkins
+  tags:
+  - jenkins_user
+- name: Copy libs-2014-07-28.tar.gz
+  shell: creates=/home/jenkins/libs.tar.gz cd /home/jenkins
+         && svn export --force --username {{user}} --password {{password}} --no-auth-cache http://engscc.tandbergtv.lan/svn/UtilityProjects_Ansible/trunk/packages/libs-2014-07-28.tar.gz 
+  tags:
+  - jenkins_user
+- name: Untar libs-2014-07-28.tar.gz
+  shell: cd /home/jenkins && tar -zxf libs-2014-07-28.tar.gz && rm -f libs-2014-07-28.tar.gz
+  tags:
+  - jenkins_user
+- name: Make jenkins the owner of libs
+  file: path=/home/jenkins/libs owner=jenkins group=jenkins state=directory recurse=yes
+  tags:
+  - jenkins_user
+- name: Create /opt/ericsson (For SVP4000)
+  file: state=directory path=/opt/ericsson owner=jenkins group=jenkins
+  tags:
+  - jenkins_user

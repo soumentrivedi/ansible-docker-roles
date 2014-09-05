@@ -1,0 +1,25 @@
+---
+-   name: Include elx-subversion variables.
+    include_vars: elx-subversion
+
+-   name: Check if SVN already exists
+    stat: path=/usr/bin/svn
+    register: check_svn_exists
+
+-   name: Install apt key for svn
+    apt_key: url={{ svn_apt_url }} id={{ svn_apt_id }} state=present
+    environment:
+      http_proxy: "{{ http_proxy }}"
+    when: check_svn_exists.stat.exists == false
+  
+-   name: Adding apt repository for svn
+    apt_repository: repo={{ svn_apt_repo }}
+    environment:
+      http_proxy: "{{ http_proxy }}"      
+    when: check_svn_exists.stat.exists == false
+    
+-   name: Install svn 1.7
+    apt: pkg={{ item }} state=present
+    when: check_svn_exists.stat.exists == false
+    with_items:
+      - "{{ svn_pkgs }}"

@@ -1,0 +1,10 @@
+---
+jenkins_master_apt_pkgs:
+  - jenkins
+  
+jenkins_master_apt_repo: 
+# APT Repository for Jenkins
+  - "deb http://pkg.jenkins-ci.org/debian-stable binary/"
+  
+jenkins_master_apt_key:
+  - "http://pkg.jenkins-ci.org/debian-stable/jenkins-ci.org.key"

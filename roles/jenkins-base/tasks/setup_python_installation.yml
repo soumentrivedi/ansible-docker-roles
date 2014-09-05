@@ -1,0 +1,33 @@
+---
+- name: install pip
+  action: easy_install name=pip
+  environment: 
+    http_proxy: "{{ proxy }}"
+  tags:
+  - pip
+  - python_setup
+- name: install unittest-xml-reporting
+  action: pip name=unittest-xml-reporting state=present
+  tags:
+  - unittest-xml-reporting
+  - python_setup
+- name: install pysnmp
+  action: pip name=pysnmp state=present
+  tags:
+  - pysnmp
+  - python_setup
+- name: install lockfile 
+  action: pip name=lockfile state=present
+  tags:
+  - lockfile
+  - python_setup
+- name: Install HTML.py
+  shell: creates=/usr/local/lib/python2.7/dist-packages/HTML.pyc svn export --force --username {{user}} --password {{password}} --no-auth-cache http://engscc.tandbergtv.lan/svn/UtilityProjects_Ansible/trunk/packages/HTML.py-0.04.zip /tmp/HTML.py-0.04.zip 
+          && unzip -o /tmp/HTML.py-0.04.zip -d /tmp 
+          && cd /tmp/HTML.py-0.04
+          && python setup.py install 
+          && rm /tmp/HTML.py-0.04.zip && rm -rf /tmp/HTML.py-0.04
+  tags: 
+  - pyHTML
+  - python_setup
+

@@ -1,0 +1,33 @@
+--- 
+-   name: Include jenkins-master variables.
+    include_vars: jenkins-master
+
+-   name: setting up jenkins-master apt key
+    apt_key: url={{ item }} state=present
+    when: ansible_distribution == 'Ubuntu'
+    with_items:    
+      - "{{ jenkins_master_apt_key }}"  
+    environment:
+      http_proxy: "{{ http_proxy }}"
+      https_proxy: "{{ https_proxy }}"
+      no_proxy: "{{ elx_no_proxy }}"
+
+-   name: setting up jenkins-master apt repository
+    apt_repository: repo='{{ item }}' state=present update_cache=yes
+    when: ansible_distribution == 'Ubuntu'
+    with_items:    
+      - "{{ jenkins_master_apt_repo }}"  
+    environment:
+      http_proxy: "{{ http_proxy }}"
+      https_proxy: "{{ https_proxy }}"
+      no_proxy: "{{ elx_no_proxy }}"
+            
+-   name: setting up jenkins-master
+    apt: name={{ item }} state=installed
+    when: ansible_distribution == 'Ubuntu'
+    with_items:    
+      - "{{ jenkins_master_apt_pkgs }}"  
+    environment:
+      http_proxy: "{{ http_proxy }}"
+      https_proxy: "{{ https_proxy }}"
+      no_proxy: "{{ elx_no_proxy }}"

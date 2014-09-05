@@ -1,0 +1,5 @@
+base_service: jenkins
+
+apache_vhosts:
+  # Additional properties: 'serveradmin, extra_parameters, loglevel'.
+ - {servername: "jenkins-server.localdomain", serveralias: "http://jenkins-server.localdomain", proxyurl: "http://localhost:8080/", location: {"*"}, serveradmin: "soumen.trivedi@gmail.com"}

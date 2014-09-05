@@ -1,0 +1,40 @@
+---
+-   name: Include elx-common variables.
+    include_vars: elx-common
+
+-   name: Include elx-apt-repo-list variables
+    include_vars: elx-apt-repo-list
+
+-   name: Add common elx repository into sources list.
+    apt_repository: repo='{{ item }}' state=present update_cache=yes
+    with_items:
+      - "{{ elx_apt_repo }}"
+    environment:
+      http_proxy: "{{ http_proxy }}"
+      https_proxy: "{{ https_proxy }}"
+      no_proxy: "{{ elx_no_proxy }}"          
+    
+-   name: Run the equivalent of "apt-get update" as a separate step
+    apt: update_cache=yes
+
+-   name: setting up base platform for elx-common
+    apt: name={{ item }} state=installed
+    when: ansible_distribution == 'Ubuntu'
+    with_items:    
+      - "{{elx_apt_pkgs}}"     
+
+-   name: setting up motd
+    template: src=motd.j2 dest=/etc/motd
+
+-   name: setting up http_proxy config
+    template: src=http_proxy.j2 dest=/etc/profile.d/http_proxy
+    
+-   name: Run the equivalent of "apt-get update" as a separate step post elx install
+    apt: update_cache=yes
+
+-   name: Add tandbergtv search domains
+    lineinfile: dest=/etc/resolvconf/resolv.conf.d/tail create=yes state=present mode=0644 line='search hedge.tandbergtv.lan tandbergtv.lan tandbergtv.com'
+
+-   name: Replace dash with bash
+    file: src=/bin/bash dest=/bin/sh state=link force=yes
+    

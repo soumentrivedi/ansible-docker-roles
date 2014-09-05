@@ -1,0 +1,19 @@
+---
+- name: Create .subversion folder to configure default settings
+  sudo: yes
+  sudo_user: jenkins
+  shell: creates=/home/jenkins/.subversion svn info --username {{ user }} --password {{ password }} --no-auth-cache {{ path }}
+- name: Update svn config with sensible defaults
+  sudo: yes
+  sudo_user: jenkins
+  ini_file: dest={{ item.dest }} section={{ item.section }} option={{ item.option }} value={{ item.value }} backup={{ item.backup }}
+  with_items:
+  - { dest: '/home/jenkins/.subversion/config', section: 'miscellany', option: 'use-commit-times',  value: 'yes', backup: no }
+  - { dest: '/home/jenkins/.subversion/config', section: 'miscellany', option: 'enable-auto-props', value: 'yes', backup: no }
+  - { dest: '/home/jenkins/.subversion/config', section: 'auto-props', option: '*.sh',              value: 'svn:eol-style=LF',                  backup: no }
+  - { dest: '/home/jenkins/.subversion/config', section: 'auto-props', option: '*.bat',             value: 'svn:eol-style=CRLF',                backup: no }
+  - { dest: '/home/jenkins/.subversion/config', section: 'auto-props', option: 'makefile*',         value: 'svn:eol-style=LF;svn:keywords=Id',  backup: no }
+  - { dest: '/home/jenkins/.subversion/config', section: 'auto-props', option: '*.c',               value: 'svn:keywords="Rev Author Date"',      backup: no }
+  - { dest: '/home/jenkins/.subversion/config', section: 'auto-props', option: '*.cpp',             value: 'svn:keywords="Rev Author Date"',      backup: no }
+  - { dest: '/home/jenkins/.subversion/config', section: 'auto-props', option: '*.h',               value: 'svn:keywords="Rev Author Date"', backup: no }
+

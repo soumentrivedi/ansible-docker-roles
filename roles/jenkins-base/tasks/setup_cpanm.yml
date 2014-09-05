@@ -1,0 +1,19 @@
+---
+- name: Test If CPANm is already installed
+  shell: perl -MApp::cpanminus -e1
+  register: result
+  ignore_errors: true
+  tags:
+   - cpanm
+- name:  Install CPANm (if not installed)
+  shell: wget --no-check-certificate -O - http://cpanmin.us | perl - App::cpanminus
+  when:  result|failed
+  tags:
+   - cpanm
+- name: Install Additional Perl libraries
+  shell: cpanm IO::Select Data::HexDump JSON XML::Simple Fcntl
+  environment: 
+    http_proxy: "{{ proxy }}"
+  tags:
+   - cpanm
+

@@ -32,10 +32,19 @@
     - shipyard-www
     - webserver-vhost    
 
-# This role deploys a rabbitmq server
-- hosts: rabbitmq-servers
+## This role deploys jenkins-slave-farm
+- hosts: jenkins-slave-farm  
   user: vagrant
-  sudo: yes    
-  roles:
-    - rabbitmq
-    
+  sudo: yes  
+  roles:    
+    - server-common
+    - jenkins-base
+
+## This role deploys jenkins-slave-farm
+- hosts: jenkins-master  
+  user: vagrant
+  sudo: yes  
+  roles:    
+    - server-common
+    - jenkins-base
+    - jenkins-master        

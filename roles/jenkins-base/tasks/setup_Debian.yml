@@ -1,0 +1,48 @@
+--- 
+-   name: Include variables from ansible-vault (username and passwword)
+    include_vars: "ansible-vault.yml"
+
+-   name: Include jenkins-common variables.
+    include_vars: jenkins-common
+
+-   name: setting up base platform for elx-common
+    apt: name={{ item }} state=installed
+    when: ansible_distribution == 'Ubuntu'
+    with_items:    
+      - "{{jenkins_base_apt_pkgs}}"  
+    environment:
+      http_proxy: "{{ http_proxy }}"
+      https_proxy: "{{ https_proxy }}"
+      no_proxy: "{{ elx_no_proxy }}"          
+      
+-   name: setup elx subversion
+    include: "setup_SVN.yml"
+
+-   name: setup elx subversion
+    include: "setup_SVN.yml"
+
+-   name: setup cpanm
+    include: "setup_cpanm.yml" 
+    vars:
+      proxy: "{{ http_proxy }}"
+
+-   name: setup python installation
+    include: "setup_python_installation.yml"
+    vars: 
+      user: "{{ svn_username }}"
+      password: "{{ svn_password }}"
+      proxy: "{{ http_proxy }}"
+
+-   name: setup jenkins user dir 
+    include: "setup_jenkins_user_dir.yml"
+    vars:
+      user: "{{ svn_username }}"
+      password: "{{ svn_password }}"
+
+-   name: setup jenkins svn defaults 
+    include: "setup_jenkins_svn_defaults.yml"
+    vars:
+      user: "{{ svn_username }}"
+      password: "{{ svn_password }}"
+      path: "{{ dummy_path }}"
+      remote_user: jenkins        

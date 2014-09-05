@@ -1,0 +1,9 @@
+---
+-   name: Include elx-common variables.
+    include_vars: elx-common
+
+-   name: Include elx-apt-repo-list variables
+    include_vars: elx-apt-repo-list
+
+-   include: "setup_Debian.yml"
+    when: ansible_os_family == 'Debian'

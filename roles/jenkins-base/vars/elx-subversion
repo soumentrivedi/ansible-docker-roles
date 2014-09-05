@@ -1,0 +1,7 @@
+---
+svn_apt_url: "http://keyserver.ubuntu.com:11371/pks/lookup?op=get&search=0xEAA903E3A2F4C039"
+svn_apt_id: "A2F4C039"
+svn_apt_repo: "ppa:svn/ppa"
+svn_pkgs:
+  - "subversion=1.7.9-0svn1~precise+svn1"
+dummy_path: http://engscc.tandbergtv.lan/svn/Common_XPO3Toolchain/trunk
