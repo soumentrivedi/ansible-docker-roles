@@ -11,8 +11,7 @@ jenkins_base_apt_pkgs:
   - tdom
   - valgrind
   - mingw32
-  - doxygen
-  - lighttpd
+  - doxygen  
   - graphviz
   - socat
   - perl
