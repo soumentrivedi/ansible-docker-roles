@@ -44,7 +44,7 @@ http_proxy:
 no_proxy: 
  - localhost
  - 127.0.0.0/8  
- - docker-registry-satv.tandbergtv.lan
+ - docker-registry.localdomain
  - 137.58.71.242
 enable_ssh: true
 project_root: /opt

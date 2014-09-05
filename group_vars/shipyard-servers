@@ -59,4 +59,4 @@ base_service: shipyard
 
 apache_vhosts:
   # Additional properties: 'serveradmin, extra_parameters, loglevel'.
- - {servername: "shipyard-server-satv.tandbergtv.lan", serveralias: "http://shipyard-server-satv.tandbergtv.lan", proxyurl: "http://localhost:8000/", location: {"*"}, serveradmin: "soumen.trivedi@ericsson.com"}
+ - {servername: "shipyard-server.localdomain", serveralias: "http://shipyard-server.localdomain", proxyurl: "http://localhost:8000/", location: {"*"}, serveradmin: "soumen.trivedi@gmail.com"}
